@@ -1,25 +1,57 @@
 import { useState, useEffect, useCallback } from 'react';
-import { apiService, User, LoginCredentials } from '../services/api';
+import { supabase } from '../lib/supabaseClient';
+
+export interface User {
+  id: string;
+  email: string;
+  name: string | null;
+  avatar_url: string | null;
+}
+
+export interface LoginCredentials {
+  email: string;
+  password: string;
+}
 
 export function useAuth() {
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [session, setSession] = useState(supabase.auth.getSession());
 
   const login = useCallback(async (credentials: LoginCredentials) => {
     setIsLoading(true);
     setError(null);
     
     try {
-      const tokenResponse = await apiService.login(credentials);
-      const userInfo = await apiService.getCurrentUser();
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email: credentials.email,
+        password: credentials.password
+      });
+
+      if (error) throw error;
+
+      // Get user profile data
+      const { data: profileData, error: profileError } = await supabase
+        .from('profiles')
+        .select('name, avatar_url')
+        .eq('id', data.user.id)
+        .single();
+
+      if (profileError && profileError.code !== 'PGRST116') {
+        console.error('Error fetching profile:', profileError);
+      }
+
+      setUser({
+        id: data.user.id,
+        email: data.user.email!,
+        name: profileData?.name || null,
+        avatar_url: profileData?.avatar_url || null
+      });
+
+      setSession(data.session);
       
-      setUser(userInfo);
-      
-      // Connect WebSocket after successful login
-      apiService.connectWebSocket(userInfo.username);
-      
-      return tokenResponse;
+      return data;
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Login failed';
       setError(errorMessage);
@@ -30,63 +62,182 @@ export function useAuth() {
   }, []);
 
   const logout = useCallback(() => {
-    apiService.logout();
-    setUser(null);
-    setError(null);
+    supabase.auth.signOut().then(() => {
+      setUser(null);
+      setSession(null);
+      setError(null);
+    });
   }, []);
 
   const checkAuthStatus = useCallback(async () => {
-    if (!apiService.isAuthenticated()) {
-      setIsLoading(false);
-      return;
-    }
-
     try {
-      const userInfo = await apiService.getCurrentUser();
-      setUser(userInfo);
+      const { data } = await supabase.auth.getSession();
       
-      // Connect WebSocket if authenticated
-      apiService.connectWebSocket(userInfo.username);
+      if (!data.session) {
+        setUser(null);
+        setSession(null);
+        setIsLoading(false);
+        return;
+      }
+      
+      setSession(data.session);
+      
+      // Get user profile data
+      const { data: userData, error: userError } = await supabase.auth.getUser();
+      
+      if (userError) throw userError;
+      
+      const { data: profileData, error: profileError } = await supabase
+        .from('profiles')
+        .select('name, avatar_url')
+        .eq('id', userData.user.id)
+        .single();
+        
+      if (profileError && profileError.code !== 'PGRST116') {
+        console.error('Error fetching profile:', profileError);
+      }
+      
+      setUser({
+        id: userData.user.id,
+        email: userData.user.email!,
+        name: profileData?.name || null,
+        avatar_url: profileData?.avatar_url || null
+      });
     } catch (err) {
-      // Token is invalid, clear it
+      console.error('Auth status check error:', err);
       logout();
     } finally {
       setIsLoading(false);
     }
   }, [logout]);
 
-  const hasScope = useCallback((scope: string): boolean => {
-    return user?.scopes.includes(scope) || false;
-  }, [user]);
-
-  const isAdmin = useCallback((): boolean => {
-    return hasScope('admin');
-  }, [hasScope]);
-
-  const canWrite = useCallback((): boolean => {
-    return hasScope('write');
-  }, [hasScope]);
-
-  const canRead = useCallback((): boolean => {
-    return hasScope('read');
-  }, [hasScope]);
+  // Listen for auth changes
+  useEffect(() => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(
+      async (event, session) => {
+        setSession(session);
+        
+        if (event === 'SIGNED_IN' && session) {
+          // Get user profile data
+          const { data: profileData, error: profileError } = await supabase
+            .from('profiles')
+            .select('name, avatar_url')
+            .eq('id', session.user.id)
+            .single();
+            
+          if (profileError && profileError.code !== 'PGRST116') {
+            console.error('Error fetching profile:', profileError);
+          }
+          
+          setUser({
+            id: session.user.id,
+            email: session.user.email!,
+            name: profileData?.name || null,
+            avatar_url: profileData?.avatar_url || null
+          });
+        }
+        
+        if (event === 'SIGNED_OUT') {
+          setUser(null);
+        }
+      }
+    );
+    
+    return () => {
+      subscription.unsubscribe();
+    };
+  }, []);
 
   // Check authentication status on mount
   useEffect(() => {
     checkAuthStatus();
   }, [checkAuthStatus]);
 
+  const register = useCallback(async (email: string, password: string, name: string) => {
+    setIsLoading(true);
+    setError(null);
+    
+    try {
+      const { data, error } = await supabase.auth.signUp({
+        email,
+        password,
+        options: {
+          data: {
+            name
+          }
+        }
+      });
+      
+      if (error) throw error;
+      
+      // Create profile record
+      if (data.user) {
+        const { error: profileError } = await supabase
+          .from('profiles')
+          .insert([
+            {
+              id: data.user.id,
+              name,
+              email
+            }
+          ]);
+          
+        if (profileError) {
+          console.error('Error creating profile:', profileError);
+        }
+      }
+      
+      return data;
+    } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : 'Registration failed';
+      setError(errorMessage);
+      throw err;
+    } finally {
+      setIsLoading(false);
+    }
+  }, []);
+
+  const updateProfile = useCallback(async (updates: Partial<Omit<User, 'id' | 'email'>>) => {
+    if (!user) throw new Error('User not authenticated');
+    
+    try {
+      const { error } = await supabase
+        .from('profiles')
+        .update(updates)
+        .eq('id', user.id);
+        
+      if (error) throw error;
+      
+      // Update local user state
+      setUser(prev => prev ? { ...prev, ...updates } : null);
+    } catch (err) {
+      console.error('Error updating profile:', err);
+      throw err;
+    }
+  }, [user]);
+
+  const resetPassword = useCallback(async (email: string) => {
+    try {
+      const { error } = await supabase.auth.resetPasswordForEmail(email);
+      if (error) throw error;
+    } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : 'Password reset failed';
+      setError(errorMessage);
+      throw err;
+    }
+  }, []);
+
   return {
     user,
     isLoading,
     error,
-    isAuthenticated: !!user,
+    isAuthenticated: !!session && !!user,
     login,
     logout,
-    hasScope,
-    isAdmin,
-    canWrite,
-    canRead,
-    clearError: () => setError(null)
+    register,
+    updateProfile,
+    resetPassword,
+    clearError: () => setError(null),
+    session
   };
 }

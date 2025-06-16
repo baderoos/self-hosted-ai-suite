@@ -1,5 +1,6 @@
 import React from 'react';
 import { motion } from 'framer-motion';
+import { WorkspaceSwitcher } from './WorkspaceSwitcher';
 import { 
   ChevronLeft, 
   ChevronRight, 
@@ -67,6 +68,17 @@ export function Sidebar({
         </motion.button>
         
         {/* Navigation Header */}
+        {!sidebarCollapsed && (
+          <motion.div
+            className="mb-6"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.3 }}
+          >
+            <WorkspaceSwitcher />
+          </motion.div>
+        )}
+        
         {!sidebarCollapsed && (
           <motion.div
             className="mb-6"

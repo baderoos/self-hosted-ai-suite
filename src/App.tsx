@@ -13,6 +13,8 @@ import { TheHive } from './components/TheHive';
 import { AIPersona } from './components/AIPersona';
 import { PersonaProvider } from './components/PersonaProvider';
 import { NexusProvider } from './core/NexusContext';
+import { WorkspaceProvider } from './contexts/WorkspaceContext';
+import { WorkspaceSelector } from './components/WorkspaceSelector';
 import { LoginForm } from './components/LoginForm';
 import { LoadingAnimation } from './components/LoadingAnimation';
 import { useAuth } from './hooks/useAuth';
@@ -28,6 +30,9 @@ import { SocialCommandPage } from './pages/SocialCommandPage';
 import { Marketplace } from './modules/Strategy/Marketplace';
 import { Analytics } from './modules/Social/Analytics';
 import { SupportCenter } from './modules/Support/SupportCenter';
+import { TeamSettingsPage } from './pages/TeamSettingsPage';
+import { BillingPage } from './pages/BillingPage';
+import { WorkspaceSettingsPage } from './pages/WorkspaceSettingsPage';
 import { 
   Home, 
   Brain,
@@ -49,7 +54,10 @@ import {
   Store,
   BarChart3,
   HelpCircle,
-  Sparkles
+  Sparkles,
+  Users,
+  CreditCard,
+  Building
 } from 'lucide-react';
 
 function App() {
@@ -257,6 +265,33 @@ function App() {
       action: () => setCurrentView('settings')
     },
     {
+      id: 'nav-team',
+      name: 'Team Settings',
+      description: 'Manage team members and permissions',
+      category: 'Navigation',
+      icon: Users,
+      keywords: ['team', 'members', 'permissions', 'invites'],
+      action: () => setCurrentView('team'),
+    },
+    {
+      id: 'nav-billing',
+      name: 'Billing & Subscription',
+      description: 'Manage your subscription and payment details',
+      category: 'Navigation',
+      icon: CreditCard,
+      keywords: ['billing', 'subscription', 'payment', 'plan'],
+      action: () => setCurrentView('billing'),
+    },
+    {
+      id: 'nav-workspace',
+      name: 'Workspace Settings',
+      description: 'Configure your workspace settings',
+      category: 'Navigation',
+      icon: Building,
+      keywords: ['workspace', 'organization', 'company'],
+      action: () => setCurrentView('workspace'),
+    },
+    {
       id: 'nav-persona',
       name: 'AI Persona',
       description: 'Manage your personal AI director that learns your style',
@@ -346,6 +381,9 @@ function App() {
     { id: 'analytics', label: 'Analytics', icon: BarChart3 },
     { id: 'support', label: 'Support', icon: HelpCircle },
     { id: 'settings', label: 'Settings', icon: Settings },
+    { id: 'team', label: 'Team Settings', icon: Users },
+    { id: 'billing', label: 'Billing', icon: CreditCard },
+    { id: 'workspace', label: 'Workspace', icon: Building },
     { id: 'persona', label: 'AI Persona', icon: UserCog },
   ];
 
@@ -423,6 +461,12 @@ function App() {
         return <Analytics />;
       case 'support':
         return <SupportCenter />;
+      case 'team':
+        return <TeamSettingsPage />;
+      case 'billing':
+        return <BillingPage />;
+      case 'workspace':
+        return <WorkspaceSettingsPage />;
       case 'settings':
         return <SettingsPage />;
       case 'persona':
@@ -435,70 +479,73 @@ function App() {
   return (
     <NexusProvider>
       <PersonaProvider>
-        <EnhancedLayout 
-          commands={commands}
-          onNavigate={setCurrentView}
-        >
-          <div className="flex">
-            {/* Sidebar */}
-            <motion.div
-              initial={{ opacity: 0, scale: 0.8 }}
-              whileHover={{ 
-                opacity: 1, 
-                scale: 1,
-                background: [
-                  "linear-gradient(90deg, rgba(99, 102, 241, 0.1) 0%, rgba(20, 184, 166, 0.1) 100%)",
-                  "linear-gradient(135deg, rgba(99, 102, 241, 0.15) 0%, rgba(20, 184, 166, 0.15) 100%)",
-                  "linear-gradient(90deg, rgba(99, 102, 241, 0.1) 0%, rgba(20, 184, 166, 0.1) 100%)"
-                ]
-              }}
-              transition={{ 
-                duration: 0.3,
-                background: { duration: 2, repeat: Infinity }
-              }}
-            >
-              <Sidebar
-                sidebarCollapsed={sidebarCollapsed}
-                setSidebarCollapsed={setSidebarCollapsed}
-                navigation={navigation}
-                currentView={currentView}
-                setCurrentView={setCurrentView}
-                user={user}
-                isConnected={isConnected}
-                logout={logout}
-              />
-            </motion.div>
+        <WorkspaceProvider>
+          <WorkspaceSelector />
+          <EnhancedLayout 
+            commands={commands}
+            onNavigate={setCurrentView}
+          >
+            <div className="flex">
+              {/* Sidebar */}
+              <motion.div
+                initial={{ opacity: 0, scale: 0.8 }}
+                whileHover={{ 
+                  opacity: 1, 
+                  scale: 1,
+                  background: [
+                    "linear-gradient(90deg, rgba(99, 102, 241, 0.1) 0%, rgba(20, 184, 166, 0.1) 100%)",
+                    "linear-gradient(135deg, rgba(99, 102, 241, 0.15) 0%, rgba(20, 184, 166, 0.15) 100%)",
+                    "linear-gradient(90deg, rgba(99, 102, 241, 0.1) 0%, rgba(20, 184, 166, 0.1) 100%)"
+                  ]
+                }}
+                transition={{ 
+                  duration: 0.3,
+                  background: { duration: 2, repeat: Infinity }
+                }}
+              >
+                <Sidebar
+                  sidebarCollapsed={sidebarCollapsed}
+                  setSidebarCollapsed={setSidebarCollapsed}
+                  navigation={navigation}
+                  currentView={currentView}
+                  setCurrentView={setCurrentView}
+                  user={user}
+                  isConnected={isConnected}
+                  logout={logout}
+                />
+              </motion.div>
 
-            {/* Main Content */}
-            <motion.main 
-              className={`flex-1 transition-all duration-300 ${
-                sidebarCollapsed ? 'lg:ml-16' : 'lg:ml-64'
-              }`}
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ duration: 0.6, delay: 0.4 }}
-            >
-              <AnimatePresence mode="wait">
-                <motion.div
-                  key={currentView}
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -20 }}
-                  transition={{ duration: 0.3 }}
-                >
-                  {renderContent()}
-                </motion.div>
-              </AnimatePresence>
-            </motion.main>
-          </div>
+              {/* Main Content */}
+              <motion.main 
+                className={`flex-1 transition-all duration-300 ${
+                  sidebarCollapsed ? 'lg:ml-16' : 'lg:ml-64'
+                }`}
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ duration: 0.6, delay: 0.4 }}
+              >
+                <AnimatePresence mode="wait">
+                  <motion.div
+                    key={currentView}
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -20 }}
+                    transition={{ duration: 0.3 }}
+                  >
+                    {renderContent()}
+                  </motion.div>
+                </AnimatePresence>
+              </motion.main>
+            </div>
 
-          {/* Mobile Bottom Navigation */}
-          <MobileNav 
-            navigation={navigation}
-            currentView={currentView}
-            setCurrentView={setCurrentView}
-          />
-        </EnhancedLayout>
+            {/* Mobile Bottom Navigation */}
+            <MobileNav 
+              navigation={navigation}
+              currentView={currentView}
+              setCurrentView={setCurrentView}
+            />
+          </EnhancedLayout>
+        </WorkspaceProvider>
       </PersonaProvider>
     </NexusProvider>
   );
