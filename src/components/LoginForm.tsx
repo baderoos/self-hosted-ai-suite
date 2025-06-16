@@ -4,7 +4,7 @@ import { LogIn, Eye, EyeOff, User, Lock, AlertCircle, Sparkles, Shield, Zap, Clo
 import { useAuth } from '../hooks/useAuth';
 
 export function LoginForm() {
-  const [credentials, setCredentials] = useState({ username: '', password: '' });
+  const [credentials, setCredentials] = useState({ email: '', password: '' });
   const [showPassword, setShowPassword] = useState(false);
   const [focusedField, setFocusedField] = useState<string | null>(null);
   const { login, isLoading, error } = useAuth();
@@ -20,7 +20,7 @@ export function LoginForm() {
 
   const fillDemoCredentials = (type: 'director' | 'operator') => {
     setCredentials({
-      username: type,
+      email: type === 'director' ? 'director@example.com' : 'operator@example.com',
       password: 'secret'
     });
   };
@@ -180,35 +180,35 @@ export function LoginForm() {
             )}
 
             <form onSubmit={handleSubmit} className="space-y-6">
-              {/* Username Field */}
+              {/* Email Field */}
               <div>
                 <label className="block text-sm font-medium text-violet-200 mb-3">
-                  Username
+                  Email
                 </label>
                 <motion.div 
                   className={`relative transition-all duration-300 ${
-                    focusedField === 'username' ? 'scale-[1.02]' : ''
+                    focusedField === 'email' ? 'scale-[1.02]' : ''
                   }`}
                   whileFocus={{ scale: 1.02 }}
                 >
                   <User size={20} className={`absolute left-4 top-1/2 transform -translate-y-1/2 transition-colors duration-200 ${
-                    focusedField === 'username' ? 'text-rose-400' : 'text-violet-400'
+                    focusedField === 'email' ? 'text-rose-400' : 'text-violet-400'
                   }`} />
                   <input
-                    type="text"
-                    value={credentials.username}
-                    onChange={(e) => setCredentials(prev => ({ ...prev, username: e.target.value }))}
-                    onFocus={() => setFocusedField('username')}
+                    type="email"
+                    value={credentials.email}
+                    onChange={(e) => setCredentials(prev => ({ ...prev, email: e.target.value }))}
+                    onFocus={() => setFocusedField('email')}
                     onBlur={() => setFocusedField(null)}
                     className="w-full pl-12 pr-4 py-4 bg-white/5 border border-rose-500/20 rounded-xl text-white placeholder-violet-400 focus:outline-none focus:ring-2 focus:ring-rose-500/50 focus:border-rose-500/50 transition-all duration-200 backdrop-blur-sm"
-                    placeholder="Enter your username"
+                    placeholder="Enter your email"
                     required
                   />
                   <motion.div
                     className="absolute inset-0 rounded-xl border-2 border-rose-500/50 opacity-0 pointer-events-none"
                     animate={{
-                      opacity: focusedField === 'username' ? 1 : 0,
-                      scale: focusedField === 'username' ? 1 : 0.95,
+                      opacity: focusedField === 'email' ? 1 : 0,
+                      scale: focusedField === 'email' ? 1 : 0.95,
                     }}
                     transition={{ duration: 0.2 }}
                   />
@@ -262,7 +262,7 @@ export function LoginForm() {
               {/* Submit Button */}
               <motion.button
                 type="submit"
-                disabled={isLoading || !credentials.username || !credentials.password}
+                disabled={isLoading || !credentials.email || !credentials.password}
                 className="w-full py-4 bg-gradient-to-r from-rose-600 to-purple-600 text-white font-semibold rounded-xl hover:from-rose-700 hover:to-purple-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 flex items-center justify-center space-x-3 relative overflow-hidden group"
                 whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.98 }}
@@ -339,8 +339,8 @@ export function LoginForm() {
               </div>
               
               <div className="text-xs text-cyan-200/70 text-center space-y-1 bg-cyan-500/10 rounded-lg p-3 border border-cyan-500/20">
-                <p><strong>Director:</strong> Enterprise tier with all features</p>
-                <p><strong>Creator:</strong> Standard tier with core features</p>
+                <p><strong>Director:</strong> director@example.com</p>
+                <p><strong>Creator:</strong> operator@example.com</p>
                 <p className="text-cyan-300/50 mt-2">Password: <code className="bg-cyan-900/30 px-1 rounded">secret</code></p>
               </div>
 
