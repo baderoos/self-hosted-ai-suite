@@ -22,23 +22,75 @@ export function AnimatedBackground({
         return 'radial-gradient(circle at 25% 25%, rgba(99, 102, 241, 0.1) 0%, transparent 50%), radial-gradient(circle at 75% 75%, rgba(20, 184, 166, 0.1) 0%, transparent 50%)';
     }
   };
+
+  const getParticleCount = () => {
+    switch (intensity) {
+      case 'dynamic': return 50;
+      case 'medium': return 30;
+      default: return 20;
+    }
+  };
   
   return (
     <div className="relative w-full h-full">
-      <div className="absolute inset-0">
-        <Canvas>
-          <Suspense fallback={null}>
-            <ParticleField count={getParticleCount()} />
-            {intensity !== 'subtle' && <FloatingElements />}
-            
-            <OrbitControls 
-              enableZoom={false} 
-              enablePan={false}
-              autoRotate
-              autoRotateSpeed={intensity === 'dynamic' ? 1 : 0.5}
+      {/* Animated Background Pattern */}
+      <div 
+        className="absolute inset-0"
+        style={{
+          background: getBackgroundPattern(),
+          backgroundSize: theme === 'matrix' ? '20px 20px' : 'auto',
+        }}
+      >
+        {/* Floating Particles */}
+        <div className="absolute inset-0 overflow-hidden">
+          {Array.from({ length: getParticleCount() }).map((_, i) => (
+            <motion.div
+              key={i}
+              className="absolute w-1 h-1 bg-primary-500/30 rounded-full"
+              initial={{
+                x: Math.random() * window.innerWidth,
+                y: Math.random() * window.innerHeight,
+              }}
+              animate={{
+                x: Math.random() * window.innerWidth,
+                y: Math.random() * window.innerHeight,
+              }}
+              transition={{
+                duration: 10 + Math.random() * 20,
+                repeat: Infinity,
+                repeatType: 'reverse',
+                ease: 'linear',
+              }}
             />
-          </Suspense>
-        </Canvas>
+          ))}
+        </div>
+
+        {/* Additional Effects for Higher Intensity */}
+        {intensity !== 'subtle' && (
+          <div className="absolute inset-0">
+            {Array.from({ length: 5 }).map((_, i) => (
+              <motion.div
+                key={`effect-${i}`}
+                className="absolute w-32 h-32 bg-gradient-to-r from-primary-500/10 to-secondary-500/10 rounded-full blur-xl"
+                initial={{
+                  x: Math.random() * window.innerWidth,
+                  y: Math.random() * window.innerHeight,
+                }}
+                animate={{
+                  x: Math.random() * window.innerWidth,
+                  y: Math.random() * window.innerHeight,
+                  scale: [1, 1.5, 1],
+                }}
+                transition={{
+                  duration: 15 + Math.random() * 10,
+                  repeat: Infinity,
+                  repeatType: 'reverse',
+                  ease: 'easeInOut',
+                }}
+              />
+            ))}
+          </div>
+        )}
       </div>
       
       {/* Content Overlay */}

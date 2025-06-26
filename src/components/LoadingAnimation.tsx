@@ -1,7 +1,5 @@
-import React, { Suspense } from 'react';
-import { Canvas } from '@react-three/fiber';
+import React from 'react';
 import { motion } from 'framer-motion';
-import { NeuralNetwork } from './3D/NeuralNetwork';
 
 interface LoadingAnimationProps {
   message?: string;
@@ -11,15 +9,29 @@ interface LoadingAnimationProps {
 export function LoadingAnimation({ message = "Processing...", progress = 0 }: LoadingAnimationProps) {
   return (
     <div className="flex flex-col items-center justify-center space-y-6">
-      {/* 3D Neural Network */}
-      <div className="w-64 h-32">
-        <Canvas>
-          <Suspense fallback={null}>
-            <ambientLight intensity={0.6} />
-            <pointLight position={[10, 10, 10]} />
-            <NeuralNetwork />
-          </Suspense>
-        </Canvas>
+      {/* Animated Neural Network Visualization */}
+      <div className="w-64 h-32 relative">
+        <div className="absolute inset-0 bg-gradient-to-r from-primary-500/20 to-secondary-500/20 rounded-lg">
+          <div className="flex items-center justify-center h-full">
+            <div className="grid grid-cols-4 gap-2">
+              {Array.from({ length: 12 }).map((_, i) => (
+                <motion.div
+                  key={i}
+                  className="w-3 h-3 bg-primary-500 rounded-full"
+                  animate={{
+                    scale: [1, 1.5, 1],
+                    opacity: [0.5, 1, 0.5],
+                  }}
+                  transition={{
+                    duration: 2,
+                    repeat: Infinity,
+                    delay: i * 0.1,
+                  }}
+                />
+              ))}
+            </div>
+          </div>
+        </div>
       </div>
       
       {/* Progress Bar */}
