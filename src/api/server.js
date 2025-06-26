@@ -7,7 +7,7 @@
 import express from 'express';
 import cors from 'cors';
 import bodyParser from 'body-parser';
-import dotenv from 'dotenv';
+import * as dotenv from 'dotenv';
 import workspaceRoutes from './workspaceRoutes';
 import { createCheckoutSession } from './createCheckoutSession';
 import { handleStripeWebhook } from './stripeWebhook';
@@ -16,7 +16,7 @@ import { handleStripeWebhook } from './stripeWebhook';
 dotenv.config();
 
 const app = express();
-const PORT = process.env.PORT || 3000;
+const PORT = parseInt(process.env.PORT || '3000', 10);
 
 // Middleware
 app.use(cors());
@@ -31,10 +31,15 @@ app.post('/api/billing/create-checkout-session', createCheckoutSession);
 
 // Health check endpoint
 app.get('/api/health', (req, res) => {
-  res.status(200).json({ status: 'ok' });
+  res.status(200).json({ 
+    status: 'ok',
+    timestamp: new Date().toISOString(),
+    environment: process.env.NODE_ENV || 'development'
+  });
 });
 
 // Start the server
 app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
+  console.log(`🚀 Server running on http://localhost:${PORT}`);
+  console.log(`Health check available at http://localhost:${PORT}/api/health`);
 });
