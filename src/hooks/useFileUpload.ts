@@ -1,11 +1,13 @@
 import { useState, useCallback } from 'react';
 import { apiService, FileUploadResponse } from '../services/api';
+import { useAuth } from './useAuth';
 
 export function useFileUpload() {
   const [isUploading, setIsUploading] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
   const [error, setError] = useState<string | null>(null);
   const [uploadedFiles, setUploadedFiles] = useState<FileUploadResponse[]>([]);
+  const { canWrite } = useAuth();
 
   const uploadSingleFile = useCallback(async (file: File): Promise<FileUploadResponse> => {
     setIsUploading(true);
@@ -37,6 +39,11 @@ export function useFileUpload() {
   }, []);
 
   const uploadMultipleFiles = useCallback(async (files: File[]) => {
+    if (!canWrite()) {
+      setError('You must be logged in to upload files');
+      throw new Error('Not authenticated');
+    }
+    
     setIsUploading(true);
     setError(null);
     setUploadProgress(0);
@@ -66,6 +73,11 @@ export function useFileUpload() {
   }, []);
 
   const deleteFile = useCallback(async (fileId: string) => {
+    if (!canWrite()) {
+      setError('You must be logged in to delete files');
+      throw new Error('Not authenticated');
+    }
+    
     try {
       await apiService.deleteFile(fileId);
       setUploadedFiles(prev => prev.filter(file => file.file_id !== fileId));
