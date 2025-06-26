@@ -1,7 +1,6 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import { WorkspaceSwitcher } from './WorkspaceSwitcher';
-import { WorkspaceSwitcher } from './WorkspaceSwitcher';
 import { 
   ChevronLeft, 
   ChevronRight, 
@@ -81,16 +80,6 @@ export function Sidebar({
         )}
         
         {!sidebarCollapsed && (
-          <>
-            <motion.div
-              className="mb-6"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ delay: 0.3 }}
-            >
-              <WorkspaceSwitcher />
-            </motion.div>
-            
             <motion.div
               className="mb-6"
               initial={{ opacity: 0, x: -20 }}
@@ -102,7 +91,6 @@ export function Sidebar({
               </h2>
               <div className="h-px bg-gradient-to-r from-primary-500/20 to-transparent" />
             </motion.div>
-          </>
         )}
       </div>
       

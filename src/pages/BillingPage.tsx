@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useWorkspace } from '../contexts/WorkspaceContext';
-import { useWorkspace } from '../contexts/WorkspaceContext';
 import { 
   CreditCard, 
   CheckCircle, 
@@ -21,7 +20,6 @@ import {
 import { apiService } from '../services/api';
 
 export function BillingPage() {
-  const { activeWorkspace, subscription } = useWorkspace();
   const { activeWorkspace, subscription } = useWorkspace();
   const [isLoading, setIsLoading] = useState(false);
   const [checkoutUrl, setCheckoutUrl] = useState<string | null>(null);
