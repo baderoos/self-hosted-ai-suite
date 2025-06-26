@@ -15,8 +15,6 @@ import { PersonaProvider } from './components/PersonaProvider';
 import { NexusProvider } from './core/NexusContext';
 import { WorkspaceProvider } from './contexts/WorkspaceContext';
 import { WorkspaceSelector } from './components/WorkspaceSelector';
-import { WorkspaceProvider } from './contexts/WorkspaceContext';
-import { WorkspaceSelector } from './components/WorkspaceSelector';
 import { LoginForm } from './components/LoginForm';
 import { LoadingAnimation } from './components/LoadingAnimation';
 import { useAuth } from './hooks/useAuth';
