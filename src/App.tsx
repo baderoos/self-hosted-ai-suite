@@ -514,8 +514,6 @@ function App() {
                   logout={logout}
                 />
               </motion.div>
-                />
-              </motion.div>
 
               {/* Main Content */}
               <motion.main 
@@ -539,8 +537,6 @@ function App() {
                 </AnimatePresence>
               </motion.main>
             </div>
-
-        </WorkspaceProvider>
             <MobileNav 
               navigation={navigation}
               currentView={currentView}
