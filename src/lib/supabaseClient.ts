@@ -1,7 +1,10 @@
-import { createClient } from '@supabase/supabase-js';
+import { createClient, SupabaseClient } from '@supabase/supabase-js';
 
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
 const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
+
+// Declare the supabase variable at the top level
+let supabase: SupabaseClient | any;
 
 // Validate environment variables and provide helpful error messages
 if (!supabaseUrl || !supabaseAnonKey || 
@@ -10,7 +13,7 @@ if (!supabaseUrl || !supabaseAnonKey ||
   console.warn('Supabase not configured. Please click "Connect to Supabase" to set up your database connection.');
   
   // Create a mock client that won't crash the app
-  export const supabase = {
+  supabase = {
     auth: {
       signUp: () => Promise.reject(new Error('Supabase not configured')),
       signInWithPassword: () => Promise.reject(new Error('Supabase not configured')),
@@ -24,14 +27,17 @@ if (!supabaseUrl || !supabaseAnonKey ||
       update: () => Promise.reject(new Error('Supabase not configured')),
       delete: () => Promise.reject(new Error('Supabase not configured'))
     })
-  } as any;
+  };
 } else {
   try {
     // Validate URL format
     new URL(supabaseUrl);
-    export const supabase = createClient(supabaseUrl, supabaseAnonKey);
+    supabase = createClient(supabaseUrl, supabaseAnonKey);
   } catch (error) {
     console.error('Invalid Supabase URL format:', supabaseUrl);
     throw new Error('Invalid Supabase URL. Please check your environment configuration.');
   }
 }
+
+// Export the supabase variable at the top level
+export { supabase };
