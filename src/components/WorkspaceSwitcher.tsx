@@ -1,11 +1,10 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { useWorkspace, Workspace } from '../contexts/WorkspaceContext';
+import { useWorkspace } from '../contexts/WorkspaceContext';
 import { 
   ChevronDown, 
   Plus, 
   Settings, 
-  LogOut, 
   Users, 
   Building, 
   CreditCard,

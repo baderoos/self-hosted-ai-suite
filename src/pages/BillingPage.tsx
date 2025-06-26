@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useWorkspace } from '../contexts/WorkspaceContext';
+import { useWorkspace } from '../contexts/WorkspaceContext';
 import { 
   CreditCard, 
   CheckCircle, 
@@ -17,15 +18,10 @@ import {
   Cpu, 
   ExternalLink
 } from 'lucide-react';
-
-interface PlanFeature {
-  name: string;
-  creator: string | number;
-  pro: string | number;
-  enterprise: string | number;
-}
+import { apiService } from '../services/api';
 
 export function BillingPage() {
+  const { activeWorkspace, subscription } = useWorkspace();
   const { activeWorkspace, subscription } = useWorkspace();
   const [isLoading, setIsLoading] = useState(false);
   const [checkoutUrl, setCheckoutUrl] = useState<string | null>(null);
@@ -60,7 +56,7 @@ export function BillingPage() {
     }
   ];
 
-  const features: PlanFeature[] = [
+  const features = [
     { name: 'Team Members', creator: '1', pro: '5', enterprise: 'Unlimited' },
     { name: 'Workspaces', creator: '1', pro: '3', enterprise: 'Unlimited' },
     { name: 'Storage', creator: '10 GB', pro: '100 GB', enterprise: '1 TB' },
@@ -79,7 +75,7 @@ export function BillingPage() {
 
   const usageMetrics = [
     { 
-      name: 'AI Video Generation', 
+      name: 'AI Video Generation',
       used: 8, 
       limit: subscription?.plan_id === 'creator' ? 10 : subscription?.plan_id === 'pro' ? 50 : -1,
       icon: Video,
@@ -109,22 +105,24 @@ export function BillingPage() {
     }
   ];
 
-  const createCheckoutSession = async (planId: string) => {
+  const createCheckoutSession = async (planId) => {
     if (!activeWorkspace) return;
     
     setIsLoading(true);
     
     try {
-      // In a real implementation, this would call your backend API
-      // const response = await fetch('/api/billing/create-checkout-session', {
-      //   method: 'POST',
-      //   headers: { 'Content-Type': 'application/json' },
-      //   body: JSON.stringify({ workspaceId: activeWorkspace.id, planId })
-      // });
-      // const data = await response.json();
-      // window.location.href = data.url;
+      // Call the backend API to create a checkout session
+      const response = await apiService.createCheckoutSession(
+        activeWorkspace.id,
+        planId
+      );
       
-      // For demo purposes, we'll just simulate a redirect
+      if (response.url) {
+        window.location.href = response.url;
+        return;
+      }
+      
+      // Fallback for demo purposes
       await new Promise(resolve => setTimeout(resolve, 1000));
       setCheckoutUrl(`https://checkout.stripe.com/c/pay/cs_test_${Math.random().toString(36).substring(2, 15)}`);
     } catch (error) {
@@ -134,7 +132,7 @@ export function BillingPage() {
     }
   };
 
-  const getStatusColor = (status: string) => {
+  const getStatusColor = (status) => {
     switch (status) {
       case 'active': return 'text-emerald-600 bg-emerald-100 dark:bg-emerald-900/30 dark:text-emerald-400';
       case 'trialing': return 'text-blue-600 bg-blue-100 dark:bg-blue-900/30 dark:text-blue-400';
@@ -144,7 +142,7 @@ export function BillingPage() {
     }
   };
 
-  const getStatusIcon = (status: string) => {
+  const getStatusIcon = (status) => {
     switch (status) {
       case 'active': return CheckCircle;
       case 'trialing': return Clock;

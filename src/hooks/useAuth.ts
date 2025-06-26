@@ -227,6 +227,10 @@ export function useAuth() {
     }
   }, []);
 
+  const canWrite = useCallback(() => {
+    return !!user;
+  }, [user]);
+
   return {
     user,
     isLoading,
@@ -237,6 +241,7 @@ export function useAuth() {
     register,
     updateProfile,
     resetPassword,
+    canWrite,
     clearError: () => setError(null),
     session
   };

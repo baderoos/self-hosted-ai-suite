@@ -15,6 +15,8 @@ import { PersonaProvider } from './components/PersonaProvider';
 import { NexusProvider } from './core/NexusContext';
 import { WorkspaceProvider } from './contexts/WorkspaceContext';
 import { WorkspaceSelector } from './components/WorkspaceSelector';
+import { WorkspaceProvider } from './contexts/WorkspaceContext';
+import { WorkspaceSelector } from './components/WorkspaceSelector';
 import { LoginForm } from './components/LoginForm';
 import { LoadingAnimation } from './components/LoadingAnimation';
 import { useAuth } from './hooks/useAuth';
@@ -514,6 +516,8 @@ function App() {
                   logout={logout}
                 />
               </motion.div>
+                />
+              </motion.div>
 
               {/* Main Content */}
               <motion.main 
@@ -538,7 +542,7 @@ function App() {
               </motion.main>
             </div>
 
-            {/* Mobile Bottom Navigation */}
+        </WorkspaceProvider>
             <MobileNav 
               navigation={navigation}
               currentView={currentView}

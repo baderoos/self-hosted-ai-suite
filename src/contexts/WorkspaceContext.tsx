@@ -20,13 +20,6 @@ export interface WorkspaceMember {
   joined_at: string;
 }
 
-export interface Subscription {
-  plan_id: 'creator' | 'pro' | 'enterprise';
-  status: 'active' | 'trialing' | 'canceled' | 'past_due';
-  trial_end: string | null;
-  current_period_end: string | null;
-}
-
 export interface WorkspaceInvitation {
   id: string;
   email: string;
@@ -42,7 +35,6 @@ export interface WorkspaceInvitation {
 interface WorkspaceContextType {
   workspaces: Workspace[];
   activeWorkspace: Workspace | null;
-  subscription: Subscription | null;
   members: WorkspaceMember[];
   invitations: WorkspaceInvitation[];
   isLoading: boolean;
@@ -56,6 +48,7 @@ interface WorkspaceContextType {
   updateMemberRole: (userId: string, role: 'admin' | 'member') => Promise<void>;
   cancelInvitation: (invitationId: string) => Promise<void>;
   acceptInvitation: (token: string) => Promise<boolean>;
+  refreshWorkspaces: () => Promise<void>;
 }
 
 const WorkspaceContext = createContext<WorkspaceContextType | undefined>(undefined);
@@ -68,7 +61,6 @@ export function WorkspaceProvider({ children }: WorkspaceProviderProps) {
   const { user, isAuthenticated } = useAuth();
   const [workspaces, setWorkspaces] = useState<Workspace[]>([]);
   const [activeWorkspace, setActiveWorkspace] = useState<Workspace | null>(null);
-  const [subscription, setSubscription] = useState<Subscription | null>(null);
   const [members, setMembers] = useState<WorkspaceMember[]>([]);
   const [invitations, setInvitations] = useState<WorkspaceInvitation[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -83,150 +75,121 @@ export function WorkspaceProvider({ children }: WorkspaceProviderProps) {
       return;
     }
 
-    async function loadWorkspaces() {
-      setIsLoading(true);
-      setError(null);
-
-      try {
-        const { data, error } = await supabase
-          .rpc('get_user_workspaces', { user_uuid: user.id });
-
-        if (error) throw error;
-
-        setWorkspaces(data || []);
-
-        // Set active workspace from localStorage or use the first one
-        const savedWorkspaceId = localStorage.getItem('activeWorkspaceId');
-        if (savedWorkspaceId && data.some(w => w.id === savedWorkspaceId)) {
-          setActiveWorkspace(data.find(w => w.id === savedWorkspaceId) || null);
-        } else if (data && data.length > 0) {
-          setActiveWorkspace(data[0]);
-          localStorage.setItem('activeWorkspaceId', data[0].id);
-        }
-      } catch (err) {
-        console.error('Error loading workspaces:', err);
-        setError('Failed to load workspaces');
-      } finally {
-        setIsLoading(false);
-      }
-    }
-
     loadWorkspaces();
   }, [user, isAuthenticated]);
-
-  // Load workspace subscription when active workspace changes
-  useEffect(() => {
-    if (!activeWorkspace) {
-      setSubscription(null);
-      return;
-    }
-
-    async function loadSubscription() {
-      try {
-        const { data, error } = await supabase
-          .rpc('get_workspace_subscription', { workspace_uuid: activeWorkspace.id });
-
-        if (error) throw error;
-
-        setSubscription(data && data.length > 0 ? data[0] : null);
-      } catch (err) {
-        console.error('Error loading subscription:', err);
-      }
-    }
-
-    loadSubscription();
-  }, [activeWorkspace]);
 
   // Load workspace members when active workspace changes
   useEffect(() => {
     if (!activeWorkspace) {
       setMembers([]);
-      return;
-    }
-
-    async function loadMembers() {
-      try {
-        const { data, error } = await supabase
-          .from('workspace_members')
-          .select(`
-            user_id,
-            role,
-            created_at,
-            users:user_id (
-              email,
-              name,
-              avatar_url
-            )
-          `)
-          .eq('workspace_id', activeWorkspace.id);
-
-        if (error) throw error;
-
-        const formattedMembers = data.map(item => ({
-          id: item.user_id,
-          email: item.users.email,
-          name: item.users.name,
-          role: item.role,
-          avatar_url: item.users.avatar_url,
-          joined_at: item.created_at
-        }));
-
-        setMembers(formattedMembers);
-      } catch (err) {
-        console.error('Error loading members:', err);
-      }
-    }
-
-    loadMembers();
-  }, [activeWorkspace]);
-
-  // Load workspace invitations when active workspace changes
-  useEffect(() => {
-    if (!activeWorkspace || !['owner', 'admin'].includes(activeWorkspace.role)) {
       setInvitations([]);
       return;
     }
 
-    async function loadInvitations() {
-      try {
-        const { data, error } = await supabase
-          .from('workspace_invitations')
-          .select(`
-            id,
-            email,
-            role,
-            expires_at,
-            created_at,
-            created_by,
-            users:created_by (
-              email,
-              name
-            )
-          `)
-          .eq('workspace_id', activeWorkspace.id);
-
-        if (error) throw error;
-
-        const formattedInvitations = data.map(item => ({
-          id: item.id,
-          email: item.email,
-          role: item.role,
-          expires_at: item.expires_at,
-          created_at: item.created_at,
-          created_by: {
-            name: item.users?.name,
-            email: item.users?.email
-          }
-        }));
-
-        setInvitations(formattedInvitations);
-      } catch (err) {
-        console.error('Error loading invitations:', err);
-      }
+    loadWorkspaceMembers();
+    if (['owner', 'admin'].includes(activeWorkspace.role)) {
+      loadWorkspaceInvitations();
     }
-
-    loadInvitations();
   }, [activeWorkspace]);
+
+  const loadWorkspaces = async () => {
+    setIsLoading(true);
+    setError(null);
+
+    try {
+      const { data, error } = await supabase
+        .rpc('get_user_workspaces', { user_uuid: user!.id });
+
+      if (error) throw error;
+
+      setWorkspaces(data || []);
+
+      // Set active workspace from localStorage or use the first one
+      const savedWorkspaceId = localStorage.getItem('activeWorkspaceId');
+      if (savedWorkspaceId && data.some(w => w.id === savedWorkspaceId)) {
+        setActiveWorkspace(data.find(w => w.id === savedWorkspaceId) || null);
+      } else if (data && data.length > 0) {
+        setActiveWorkspace(data[0]);
+        localStorage.setItem('activeWorkspaceId', data[0].id);
+      }
+    } catch (err) {
+      console.error('Error loading workspaces:', err);
+      setError('Failed to load workspaces');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const loadWorkspaceMembers = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('workspace_members')
+        .select(`
+          user_id,
+          role,
+          created_at,
+          users:user_id (
+            email,
+            name,
+            avatar_url
+          )
+        `)
+        .eq('workspace_id', activeWorkspace!.id);
+
+      if (error) throw error;
+
+      const formattedMembers = data.map(item => ({
+        id: item.user_id,
+        email: item.users.email,
+        name: item.users.name,
+        role: item.role,
+        avatar_url: item.users.avatar_url,
+        joined_at: item.created_at
+      }));
+
+      setMembers(formattedMembers);
+    } catch (err) {
+      console.error('Error loading members:', err);
+    }
+  };
+
+  const loadWorkspaceInvitations = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('workspace_invitations')
+        .select(`
+          id,
+          email,
+          role,
+          expires_at,
+          created_at,
+          created_by,
+          users:created_by (
+            email,
+            name
+          )
+        `)
+        .eq('workspace_id', activeWorkspace!.id);
+
+      if (error) throw error;
+
+      const formattedInvitations = data.map(item => ({
+        id: item.id,
+        email: item.email,
+        role: item.role,
+        expires_at: item.expires_at,
+        created_at: item.created_at,
+        created_by: {
+          name: item.users?.name,
+          email: item.users?.email
+        }
+      }));
+
+      setInvitations(formattedInvitations);
+    } catch (err) {
+      console.error('Error loading invitations:', err);
+    }
+  };
 
   // Set active workspace and save to localStorage
   const handleSetActiveWorkspace = (workspace: Workspace) => {
@@ -337,37 +300,7 @@ export function WorkspaceProvider({ children }: WorkspaceProviderProps) {
       if (error) throw error;
 
       // Refresh invitations
-      const { data: newInvitations, error: invitationsError } = await supabase
-        .from('workspace_invitations')
-        .select(`
-          id,
-          email,
-          role,
-          expires_at,
-          created_at,
-          created_by,
-          users:created_by (
-            email,
-            name
-          )
-        `)
-        .eq('workspace_id', activeWorkspace.id);
-
-      if (invitationsError) throw invitationsError;
-
-      const formattedInvitations = newInvitations.map(item => ({
-        id: item.id,
-        email: item.email,
-        role: item.role,
-        expires_at: item.expires_at,
-        created_at: item.created_at,
-        created_by: {
-          name: item.users?.name,
-          email: item.users?.email
-        }
-      }));
-
-      setInvitations(formattedInvitations);
+      loadWorkspaceInvitations();
     } catch (err) {
       console.error('Error inviting member:', err);
       throw err;
@@ -454,18 +387,7 @@ export function WorkspaceProvider({ children }: WorkspaceProviderProps) {
 
       // Refresh workspaces if invitation was accepted
       if (data) {
-        const { data: workspacesData, error: workspacesError } = await supabase
-          .rpc('get_user_workspaces', { user_uuid: user.id });
-
-        if (workspacesError) throw workspacesError;
-
-        setWorkspaces(workspacesData || []);
-        
-        // Set the newly joined workspace as active
-        const newWorkspace = workspacesData.find(w => !workspaces.some(existing => existing.id === w.id));
-        if (newWorkspace) {
-          handleSetActiveWorkspace(newWorkspace);
-        }
+        await loadWorkspaces();
       }
 
       return !!data;
@@ -475,10 +397,14 @@ export function WorkspaceProvider({ children }: WorkspaceProviderProps) {
     }
   };
 
+  // Refresh workspaces
+  const refreshWorkspaces = async (): Promise<void> => {
+    await loadWorkspaces();
+  };
+
   const contextValue: WorkspaceContextType = {
     workspaces,
     activeWorkspace,
-    subscription,
     members,
     invitations,
     isLoading,
@@ -491,7 +417,8 @@ export function WorkspaceProvider({ children }: WorkspaceProviderProps) {
     removeMember,
     updateMemberRole,
     cancelInvitation,
-    acceptInvitation
+    acceptInvitation,
+    refreshWorkspaces
   };
 
   return (
