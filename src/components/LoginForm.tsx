@@ -177,6 +177,17 @@ export function LoginForm() {
                   </div>
                 </div>
               </motion.div>
+              <div className="flex justify-center mt-4">
+                <a 
+                  href="https://supabase.com/dashboard" 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="text-sm text-indigo-400 hover:text-white transition-colors flex items-center space-x-1"
+                >
+                  <span>Need to set up Supabase?</span>
+                  <ExternalLink size={12} />
+                </a>
+              </div>
             )}
 
             <form onSubmit={handleSubmit} className="space-y-6">

@@ -157,6 +157,18 @@ export function useAuth() {
     setIsLoading(true);
     setError(null);
     
+    if (!email || !password) {
+      setError('Email and password are required');
+      setIsLoading(false);
+      return;
+    }
+    
+    if (password.length < 6) {
+      setError('Password must be at least 6 characters long');
+      setIsLoading(false);
+      return;
+    }
+    
     try {
       const { data, error } = await supabase.auth.signUp({
         email,
@@ -172,18 +184,23 @@ export function useAuth() {
       
       // Create profile record
       if (data.user) {
-        const { error: profileError } = await supabase
-          .from('profiles')
-          .insert([
-            {
-              id: data.user.id,
-              name,
-              email
-            }
-          ]);
-          
-        if (profileError) {
-          console.error('Error creating profile:', profileError);
+        try {
+          const { error: profileError } = await supabase
+            .from('profiles')
+            .insert([
+              {
+                id: data.user.id,
+                name,
+                email
+              }
+            ]);
+            
+          if (profileError) {
+            console.error('Error creating profile:', profileError);
+          }
+        } catch (profileErr) {
+          console.error('Error creating profile:', profileErr);
+          // Don't fail the registration if profile creation fails
         }
       }
       
@@ -198,7 +215,10 @@ export function useAuth() {
   }, []);
 
   const updateProfile = useCallback(async (updates: Partial<Omit<User, 'id' | 'email'>>) => {
-    if (!user) throw new Error('User not authenticated');
+    if (!user) {
+      setError('User not authenticated');
+      throw new Error('User not authenticated');
+    }
     
     try {
       const { error } = await supabase
