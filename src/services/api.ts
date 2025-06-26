@@ -1,5 +1,5 @@
 // Enhanced API Service for MCP Backend Integration with Authentication, File Upload, and WebSocket
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'https://api.mcpsuite.com';
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000/api';
 const GOOGLE_AI_API_URL = 'https://generativelanguage.googleapis.com/v1beta';
 
 export interface MCPCommand {
@@ -1350,6 +1350,13 @@ class APIService {
   async resetPersonaLearning(): Promise<{ success: boolean }> {
     return this.request<{ success: boolean }>('/persona/reset', {
       method: 'POST',
+    });
+  }
+
+  async createCheckoutSession(workspaceId, planId) {
+    return this.request('/billing/create-checkout-session', {
+      method: 'POST',
+      body: JSON.stringify({ workspaceId, planId }),
     });
   }
 }
