@@ -168,33 +168,35 @@ export function LoginForm() {
           <div className="absolute inset-0 bg-gradient-to-br from-white/10 to-white/5 backdrop-blur-xl rounded-3xl border border-rose-500/20 shadow-2xl" />
           <div className="relative p-8">
             {error && (
-              <motion.div className="mb-6 p-4 bg-red-500/20 border border-red-400/30 rounded-xl"
-                          initial={{ opacity: 0, x: -20 }}
-                          animate={{ opacity: 1, x: 0 }}
-                          layout>
-                <div className="flex items-start space-x-3">
-                  <AlertCircle size={20} className="flex-shrink-0 mt-0.5 text-red-400" />
-                  <div className="flex-1">
-                    <div className="text-red-200">{error}</div>
-                    {error.includes('Supabase not configured') && (
-                      <div className="mt-2 text-xs text-red-300">
-                        Please configure Supabase by clicking "Connect to Supabase" in the top right corner.
-                      </div>
-                    )}
+              <>
+                <motion.div className="mb-6 p-4 bg-red-500/20 border border-red-400/30 rounded-xl"
+                            initial={{ opacity: 0, x: -20 }}
+                            animate={{ opacity: 1, x: 0 }}
+                            layout>
+                  <div className="flex items-start space-x-3">
+                    <AlertCircle size={20} className="flex-shrink-0 mt-0.5 text-red-400" />
+                    <div className="flex-1">
+                      <div className="text-red-200">{error}</div>
+                      {error.includes('Supabase not configured') && (
+                        <div className="mt-2 text-xs text-red-300">
+                          Please configure Supabase by clicking "Connect to Supabase" in the top right corner.
+                        </div>
+                      )}
+                    </div>
                   </div>
+                </motion.div>
+                <div className="flex justify-center mt-4">
+                  <a 
+                    href="https://supabase.com/dashboard/project/fpsqwsticysljkidpxos" 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    className="text-sm text-indigo-400 hover:text-white transition-colors flex items-center space-x-1"
+                  >
+                    <span>Go to Supabase Dashboard</span>
+                    <ExternalLink size={12} />
+                  </a>
                 </div>
-              </motion.div>
-              <div className="flex justify-center mt-4">
-                <a 
-                  href="https://supabase.com/dashboard/project/fpsqwsticysljkidpxos" 
-                  target="_blank" 
-                  rel="noopener noreferrer"
-                  className="text-sm text-indigo-400 hover:text-white transition-colors flex items-center space-x-1"
-                >
-                  <span>Go to Supabase Dashboard</span>
-                  <ExternalLink size={12} />
-                </a>
-              </div>
+              </>
             )}
 
             <AnimatePresence mode="wait">
