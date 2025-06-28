@@ -1,6 +1,6 @@
-import React from 'react';
-import { motion } from 'framer-motion';
-import { colorClassMap } from '../../lib/colorClassMap';
+import React from "react";
+import { motion } from "framer-motion";
+import { colorClassMap } from "../../lib/colorClassMap";
 
 interface StatItem {
   label: string;
@@ -28,12 +28,22 @@ export function DashboardStats({ stats }: DashboardStatsProps) {
           whileHover={{ y: -5, scale: 1.02 }}
         >
           <div className="flex items-center justify-between mb-4">
-            <motion.div 
-              className={`p-3 rounded-xl ${colorClassMap[stat.color]?.bg || 'bg-neutral-100 dark:bg-neutral-900/30'}`}
+            <motion.div
+              className={`p-3 rounded-xl ${
+                colorClassMap[stat.color]?.bg ||
+                "bg-neutral-100 dark:bg-neutral-900/30"
+              }`}
               whileHover={{ rotate: 360 }}
               transition={{ duration: 0.6 }}
             >
-              <stat.icon size={24} className={`${colorClassMap[stat.color]?.text || 'text-neutral-600'} ${colorClassMap[stat.color]?.darkText || 'dark:text-neutral-400'}`} />
+              <stat.icon
+                size={24}
+                className={`${
+                  colorClassMap[stat.color]?.text || "text-neutral-600"
+                } ${
+                  colorClassMap[stat.color]?.darkText || "dark:text-neutral-400"
+                }`}
+              />
             </motion.div>
             <span className="text-sm text-emerald-600 dark:text-emerald-400 font-medium">
               {stat.change}

@@ -36,7 +36,8 @@ export function ConsoleLog({
   logEndRef,
 }: ConsoleLogProps) {
   // Map progress bar colors to static Tailwind classes
-  const progressBarClass = "h-1 bg-gradient-to-r from-primary-500 to-secondary-500 rounded-full";
+  const progressBarClass =
+    "h-1 bg-gradient-to-r from-primary-500 to-secondary-500 rounded-full";
 
   return (
     <div className="bg-neutral-900 dark:bg-neutral-950 rounded-2xl border border-neutral-700 overflow-hidden shadow-2xl">
@@ -69,7 +70,9 @@ export function ConsoleLog({
         <AnimatePresence>
           {logs.map((log) => {
             const LogIcon = getLogIcon(log.type);
-            const associatedTask = tasks.find((task) => task.task_id === log.task_id);
+            const associatedTask = tasks.find(
+              (task) => task.task_id === log.task_id
+            );
             return (
               <motion.div
                 key={log.id}

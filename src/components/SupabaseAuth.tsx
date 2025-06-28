@@ -22,13 +22,14 @@ export default function SupabaseAuth() {
     checkUser();
 
     // Listen for auth changes
-    const {
-      data: { subscription },
-    } = supabase.auth.onAuthStateChange((event, session) => {
+    const { data } = supabase.auth.onAuthStateChange((_, session) => {
       setUser(session?.user ?? null);
     });
+    const subscription = data?.subscription || data;
 
-    return () => subscription.unsubscribe();
+    return () => {
+      subscription?.unsubscribe?.();
+    };
   }, []);
 
   return (

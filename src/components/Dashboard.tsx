@@ -1,12 +1,12 @@
-import React, { useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { 
-  Brain, 
-  Image, 
-  Video, 
-  FileText, 
-  Share2, 
-  Settings, 
+import React, { useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import {
+  Brain,
+  Image,
+  Video,
+  FileText,
+  Share2,
+  Settings,
   Activity,
   Plus,
   TrendingUp,
@@ -21,69 +21,69 @@ import {
   BarChart3,
   PlayCircle,
   Download,
-  Mic
-} from 'lucide-react';
-import { DashboardHeader } from './dashboard/DashboardHeader';
-import { DashboardStats } from './dashboard/DashboardStats';
-import { RecentJobs } from './dashboard/RecentJobs';
-import { SuggestedWorkflows } from './dashboard/SuggestedWorkflows';
-import { SystemMetrics } from './dashboard/SystemMetrics';
-import { useMCPTasks } from '../hooks/useMCPTasks';
-import { useSystemStatus } from '../hooks/useSystemStatus';
-import { useNexus } from '../core/NexusContext';
+  Mic,
+} from "lucide-react";
+import { DashboardHeader } from "./dashboard/DashboardHeader";
+import { DashboardStats } from "./dashboard/DashboardStats";
+import { RecentJobs } from "./dashboard/RecentJobs";
+import { SuggestedWorkflows } from "./dashboard/SuggestedWorkflows";
+import { SystemMetrics } from "./dashboard/SystemMetrics";
+import { useMCPTasks } from "../hooks/useMCPTasks";
+import { useSystemStatus } from "../hooks/useSystemStatus";
+import { useNexus } from "../core/NexusContext";
 
 export function Dashboard() {
-  const [activeTab, setActiveTab] = useState('overview');
-  const [timeRange, setTimeRange] = useState('24h');
+  const [activeTab, setActiveTab] = useState("overview");
+  const [timeRange, setTimeRange] = useState("24h");
   const { echoState, getPersonalizedSuggestions } = useNexus();
   const { tasks } = useMCPTasks();
   const { status: systemStatus, isOnline } = useSystemStatus();
 
   const stats = [
-    { 
-      label: 'MCP Directives Executed', 
-      value: tasks.length.toString(), 
-      change: '+12%', 
+    {
+      label: "MCP Directives Executed",
+      value: tasks.length.toString(),
+      change: "+12%",
       icon: Brain,
-      color: 'primary',
-      description: 'Natural language commands processed'
+      color: "primary",
+      description: "Natural language commands processed",
     },
-    { 
-      label: 'AI Agent Hours', 
-      value: '156.2', 
-      change: '+8%', 
+    {
+      label: "AI Agent Hours",
+      value: "156.2",
+      change: "+8%",
       icon: Activity,
-      color: 'secondary',
-      description: 'Total processing time across all agents'
+      color: "secondary",
+      description: "Total processing time across all agents",
     },
-    { 
-      label: 'Multi-Cam Projects', 
-      value: '89', 
-      change: '+15%', 
+    {
+      label: "Multi-Cam Projects",
+      value: "89",
+      change: "+15%",
       icon: Video,
-      color: 'accent',
-      description: 'Intelligent multi-camera productions'
+      color: "accent",
+      description: "Intelligent multi-camera productions",
     },
-    { 
-      label: 'Auto-Generated Clips', 
-      value: '1,284', 
-      change: '+23%', 
+    {
+      label: "Auto-Generated Clips",
+      value: "1,284",
+      change: "+23%",
       icon: Share2,
-      color: 'purple',
-      description: 'Social media content created'
+      color: "purple",
+      description: "Social media content created",
     },
   ];
 
   // Convert tasks to recent jobs format
-  const recentJobs = tasks.slice(0, 10).map(task => ({
+  const recentJobs = tasks.slice(0, 10).map((task) => ({
     id: task.task_id,
     type: task.current_step,
     status: task.status,
-    title: task.logs[0]?.replace(/^\[\d{2}:\d{2}:\d{2}\]\s*/, '') || 'MCP Task',
+    title: task.logs[0]?.replace(/^\[\d{2}:\d{2}:\d{2}\]\s*/, "") || "MCP Task",
     time: new Date(task.timestamp).toLocaleString(),
-    duration: task.status === 'completed' ? 'Completed' : `${task.progress}%`,
-    agent: 'MCP',
-    progress: task.progress
+    duration: task.status === "completed" ? "Completed" : `${task.progress}%`,
+    agent: "MCP",
+    progress: task.progress,
   }));
 
   const workflowTemplates = [
@@ -93,7 +93,7 @@ export function Dashboard() {
       steps: 7,
       avgTime: "2h 15m",
       icon: Mic,
-      color: "emerald"
+      color: "emerald",
     },
     {
       name: "Viral Content Factory",
@@ -101,7 +101,7 @@ export function Dashboard() {
       steps: 5,
       avgTime: "45m",
       icon: TrendingUp,
-      color: "pink"
+      color: "pink",
     },
     {
       name: "Live Event Coverage",
@@ -109,7 +109,7 @@ export function Dashboard() {
       steps: 6,
       avgTime: "3h 30m",
       icon: Video,
-      color: "blue"
+      color: "blue",
     },
     {
       name: "Documentary Assembly",
@@ -117,20 +117,44 @@ export function Dashboard() {
       steps: 9,
       avgTime: "4h 45m",
       icon: FileText,
-      color: "orange"
-    }
+      color: "orange",
+    },
   ];
 
   const systemMetrics = [
-    { label: 'API Status', value: isOnline ? 100 : 0, unit: '%', color: 'blue', icon: Cpu },
-    { label: 'Active Tasks', value: tasks.filter(t => t.status === 'processing').length, unit: '', color: 'green', icon: HardDrive },
-    { label: 'Redis Status', value: systemStatus?.redis_status === 'connected' ? 100 : 0, unit: '%', color: 'purple', icon: Activity },
-    { label: 'Total Tasks', value: tasks.length, unit: '', color: 'orange', icon: HardDrive }
+    {
+      label: "API Status",
+      value: isOnline ? 100 : 0,
+      unit: "%",
+      color: "blue",
+      icon: Cpu,
+    },
+    {
+      label: "Active Tasks",
+      value: tasks.filter((t) => t.status === "processing").length,
+      unit: "",
+      color: "green",
+      icon: HardDrive,
+    },
+    {
+      label: "Redis Status",
+      value: systemStatus?.redis_status === "connected" ? 100 : 0,
+      unit: "%",
+      color: "purple",
+      icon: Activity,
+    },
+    {
+      label: "Total Tasks",
+      value: tasks.length,
+      unit: "",
+      color: "orange",
+      icon: HardDrive,
+    },
   ];
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-      <DashboardHeader 
+      <DashboardHeader
         timeRange={timeRange}
         onTimeRangeChange={(value) => setTimeRange(value)}
       />
@@ -144,14 +168,34 @@ export function Dashboard() {
 
         {/* Quick Actions & System Status */}
         <div className="lg:col-span-1 space-y-6">
-          <SuggestedWorkflows 
-            templates={getPersonalizedSuggestions('dashboard').concat(workflowTemplates).slice(0, 4)} 
+          <SuggestedWorkflows
+            templates={getPersonalizedSuggestions("dashboard")
+              .concat(workflowTemplates)
+              .slice(0, 4)}
           />
-          <SystemMetrics 
+          <SystemMetrics
             echoMetrics={[
-              { label: 'Learning Strength', value: echoState.patterns.length * 5, unit: '%', color: 'indigo', icon: Brain },
-              { label: 'Total Interactions', value: echoState.totalInteractions, unit: '', color: 'purple', icon: Activity },
-              { label: 'System Health', value: echoState.systemHealth.performance, unit: '%', color: 'emerald', icon: Cpu }
+              {
+                label: "Learning Strength",
+                value: echoState.patterns.length * 5,
+                unit: "%",
+                color: "indigo",
+                icon: Brain,
+              },
+              {
+                label: "Total Interactions",
+                value: echoState.totalInteractions,
+                unit: "",
+                color: "purple",
+                icon: Activity,
+              },
+              {
+                label: "System Health",
+                value: echoState.systemHealth.performance,
+                unit: "%",
+                color: "emerald",
+                icon: Cpu,
+              },
             ]}
             systemMetrics={systemMetrics}
           />
