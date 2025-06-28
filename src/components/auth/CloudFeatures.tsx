@@ -1,6 +1,6 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { Cloud, Globe, Fingerprint } from 'lucide-react';
+import { Cloud, Globe, Key } from 'lucide-react';
 
 export function CloudFeatures() {
   return (
@@ -8,7 +8,7 @@ export function CloudFeatures() {
       {[
         { icon: Cloud, label: 'Cloud-Powered', color: 'text-cyan-400' },
         { icon: Globe, label: 'Global Access', color: 'text-emerald-400' },
-        { icon: Fingerprint, label: 'Two-Factor Auth', color: 'text-amber-400' }
+        { icon: Key, label: 'Two-Factor Auth', color: 'text-amber-400' }
       ].map((item, index) => (
         <motion.div
           key={item.label}
