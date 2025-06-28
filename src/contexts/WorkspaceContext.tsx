@@ -132,7 +132,11 @@ export function WorkspaceProvider({ children }: WorkspaceProviderProps) {
           user_id,
           role,
           created_at,
-          users:user_id (
+          profiles:user_id (
+            name,
+            avatar_url
+          ),
+          auth_users:user_id (
             email,
             name,
             avatar_url
@@ -144,16 +148,49 @@ export function WorkspaceProvider({ children }: WorkspaceProviderProps) {
 
       const formattedMembers = data.map(item => ({
         id: item.user_id,
-        email: item.users.email,
-        name: item.users.name,
+        email: item.auth_users?.email || '',
+        name: item.profiles?.name || item.auth_users?.name || null,
         role: item.role,
-        avatar_url: item.users.avatar_url,
+        avatar_url: item.profiles?.avatar_url || item.auth_users?.avatar_url || null,
         joined_at: item.created_at
       }));
 
       setMembers(formattedMembers);
     } catch (err) {
       console.error('Error loading members:', err);
+      // Fallback query without joins if the above fails
+      try {
+        const { data: membersData, error: membersError } = await supabase
+          .from('workspace_members')
+          .select('user_id, role, created_at')
+          .eq('workspace_id', activeWorkspace!.id);
+
+        if (membersError) throw membersError;
+
+        // Get user details separately
+        const memberPromises = membersData.map(async (member) => {
+          const { data: userData } = await supabase.auth.admin.getUserById(member.user_id);
+          const { data: profileData } = await supabase
+            .from('profiles')
+            .select('name, avatar_url')
+            .eq('user_id', member.user_id)
+            .single();
+
+          return {
+            id: member.user_id,
+            email: userData.user?.email || '',
+            name: profileData?.name || userData.user?.user_metadata?.name || null,
+            role: member.role,
+            avatar_url: profileData?.avatar_url || userData.user?.user_metadata?.avatar_url || null,
+            joined_at: member.created_at
+          };
+        });
+
+        const members = await Promise.all(memberPromises);
+        setMembers(members);
+      } catch (fallbackErr) {
+        console.error('Fallback member loading also failed:', fallbackErr);
+      }
     }
   };
 
