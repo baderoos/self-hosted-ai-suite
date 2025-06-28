@@ -38,7 +38,7 @@ export function useAuth() {
         .from('profiles')
         .select('name, avatar_url')
         .eq('id', data.user.id)
-        .single();
+        .maybeSingle();
 
       if (profileError && profileError.code !== 'PGRST116') {
         console.error('Error fetching profile:', profileError);
@@ -96,7 +96,7 @@ export function useAuth() {
         .from('profiles')
         .select('name, avatar_url')
         .eq('id', userData.user.id)
-        .single();
+        .maybeSingle();
         
       if (profileError && profileError.code !== 'PGRST116') {
         console.error('Error fetching profile:', profileError);
@@ -131,7 +131,7 @@ export function useAuth() {
             .from('profiles')
             .select('name, avatar_url')
             .eq('id', session.user.id)
-            .single();
+            .maybeSingle();
             
           if (profileError && profileError.code !== 'PGRST116') {
             console.error('Error fetching profile:', profileError);
