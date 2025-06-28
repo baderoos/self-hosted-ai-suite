@@ -199,6 +199,7 @@ export function useAuth() {
               {
                 user_id: data.user.id,
                 name
+              }
             ]);
             
           if (profileError) {
