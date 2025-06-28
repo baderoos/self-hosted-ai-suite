@@ -15,8 +15,7 @@ dist-ssr
 backend/.env
 
 # Editor directories and files
-.vscode/*
-!.vscode/extensions.json
+.vscode/
 .idea
 .DS_Store
 *.suo
@@ -24,4 +23,6 @@ backend/.env
 *.njsproj
 *.sln
 *.sw?
-.env
+
+# Ignore VS Code extension recommendations (personal)
+.vscode/extensions.json

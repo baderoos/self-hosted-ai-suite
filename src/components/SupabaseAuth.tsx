@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { supabase } from "../lib/supabaseClient";
 import type { User } from "@supabase/auth-js";
+import { AuthForm } from "./auth/AuthForm";
+import { UserProfile } from "./auth/UserProfile";
 
 export default function SupabaseAuth() {
   const [email, setEmail] = useState("");
@@ -18,107 +20,77 @@ export default function SupabaseAuth() {
     checkUser();
 
     // Listen for auth changes
-    const { data } = supabase.auth.onAuthStateChange((event, session) => {
-      setUser(session?.user ?? null);
-    });
-
-    return () => {
-      data?.subscription?.unsubscribe?.();
-    };
-  }, []);
-
-  const handleSignUp = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setLoading(true);
-    setError("");
-    const { data, error } = await supabase.auth.signUp({ email, password });
-    if (error) setError(error.message);
-    else setUser(data.user);
-    setLoading(false);
-  };
-
-  const handleSignIn = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setLoading(true);
-    setError("");
-    const { data, error } = await supabase.auth.signInWithPassword({
-      email,
-      password,
-    });
-    if (error) setError(error.message);
-    else setUser(data.user);
-    setLoading(false);
-  };
-
-  const handleSignOut = async () => {
-    setLoading(true);
-    setError("");
-    try {
-      const { error } = await supabase.auth.signOut();
-      if (error) {
-        setError(error.message);
-        console.error("Sign out error:", error.message);
-      } else {
-        setUser(null);
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(
+      (event, session) => {
+        setUser(session?.user ?? null);
       }
-    } catch (err) {
-      setError("Unexpected error during sign out.");
-      console.error("Unexpected sign out error:", err);
-    } finally {
-      setLoading(false);
-    }
-  };
+    );
+    
+    return () => subscription.unsubscribe();
+  }, []);
 
   return (
     <div className="max-w-sm mx-auto p-4 border rounded shadow">
-      {user === null && !loading ? (
-        <form onSubmit={handleSignIn}>
-          <input
-            className="block w-full mb-2 p-2 border rounded"
-            type="email"
-            placeholder="Email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-          />
-          <input
-            className="block w-full mb-2 p-2 border rounded"
-            type="password"
-            placeholder="Password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-          />
-          <div className="flex gap-2">
-            <button
-              type="submit"
-              className="bg-blue-500 text-white px-4 py-2 rounded"
-              disabled={loading}
-            >
-              Sign In
-            </button>
-            <button
-              type="button"
-              onClick={handleSignUp}
-              className="bg-green-500 text-white px-4 py-2 rounded"
-              disabled={loading}
-            >
-              Sign Up
-            </button>
-          </div>
-          {error && <p className="text-red-500 mt-2">{error}</p>}
-        </form>
-      ) : user ? (
-        <div>
-          <p className="mb-4">Signed in as {user.email}</p>
-          <button
-            onClick={handleSignOut}
-            className="bg-red-500 text-white px-4 py-2 rounded"
-            disabled={loading}
-          >
-            Sign Out
-          </button>
-        </div>
+      {user ? (
+        <UserProfile 
+          user={user} 
+          onSignOut={async () => {
+            setLoading(true);
+            setError("");
+            try {
+              const { error } = await supabase.auth.signOut();
+              if (error) {
+                setError(error.message);
+                console.error("Sign out error:", error.message);
+              } else {
+                setUser(null);
+              }
+            } catch (err) {
+              setError("Unexpected error during sign out.");
+              console.error("Unexpected sign out error:", err);
+            } finally {
+              setLoading(false);
+            }
+          }}
+        />
       ) : (
-        <div className="text-center">Loading...</div>
+        <AuthForm
+          email={email}
+          setEmail={setEmail}
+          password={password}
+          setPassword={setPassword}
+          loading={loading}
+          error={error}
+          onSignIn={async (e) => {
+            e.preventDefault();
+            setLoading(true);
+            setError("");
+            const { data, error } = await supabase.auth.signInWithPassword({
+              email,
+              password,
+            });
+            if (error) setError(error.message);
+            else setUser(data.user);
+            setLoading(false);
+          }}
+          onSignUp={async (e) => {
+            e.preventDefault();
+            setLoading(true);
+            setError("");
+            const { data, error } = await supabase.auth.signUp({ email, password });
+            if (error) {
+              setError(error.message);
+            } else if (data.user) {
+              setUser(data.user);
+            } else {
+              // If user is null, confirmation may be required
+              setError(
+                "Sign-up successful! Please check your email to confirm your account before signing in."
+              );
+            }
+            setLoading(false);
+          }}
+        />
       )}
     </div>
   );
