@@ -5,7 +5,7 @@ import { lazy, Suspense } from 'react';
 
 // Lazy load components
 const AnimatedBackground = lazy(() => import('./AnimatedBackground').then(module => ({ default: module.AnimatedBackground })));
-const AnimatedCard = lazy(() => import('./AnimatedCard'));
+const AnimatedCard = lazy(() => import('./AnimatedCard').then(module => ({ default: module.AnimatedCard })));
 
 export function EnhancedHero() {
   const features = [
