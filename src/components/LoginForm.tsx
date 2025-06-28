@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
-  Fingerprint,
   ExternalLink,
   UserPlus,
   Mail,
@@ -12,6 +11,7 @@ import {
   EyeOff,
   Cloud,
   Globe,
+  Key,
   Shield,
   CheckCircle,
   AlertCircle,
