@@ -2,7 +2,6 @@ import React, { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 import { NexusProvider } from './core/NexusContext';
 import './index.css';
-
 // Lazy load the App component
 const App = React.lazy(() => import('./App.tsx'));
 
