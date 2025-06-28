@@ -151,8 +151,30 @@ export function Dashboard() {
             echoMetrics={[
               { label: 'Learning Strength', value: echoState.patterns.length * 5, unit: '%', color: 'indigo', icon: Brain },
               { label: 'Total Interactions', value: echoState.totalInteractions, unit: '', color: 'purple', icon: Activity },
-              { label: 'Insights Generated', value: echoState.insights.length, unit: '', color: 'pink', icon: Sparkles },
-              { label: 'System Health', value: echoState.systemHealth.performance, unit: '%', color: 'emerald', icon: Cpu }
+import { 
+  Brain, 
+  Image, 
+  Video, 
+  FileText, 
+  Share2, 
+  Settings, 
+  Activity,
+  Plus,
+  TrendingUp,
+  Clock,
+  CheckCircle,
+  AlertCircle,
+  Eye,
+  Zap,
+  Cpu,
+  HardDrive,
+  Users,
+  BarChart3,
+  PlayCircle,
+  Download,
+  Mic,
+  Sparkles
+} from 'lucide-react';              { label: 'System Health', value: echoState.systemHealth.performance, unit: '%', color: 'emerald', icon: Cpu }
             ]}
             systemMetrics={systemMetrics}
           />

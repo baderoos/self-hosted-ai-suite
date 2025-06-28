@@ -1,5 +1,5 @@
-import React from 'react';
-import { motion } from 'framer-motion';
+import React from "react";
+import { motion } from "framer-motion";
 
 interface Metric {
   label: string;
@@ -14,7 +14,21 @@ interface SystemMetricsProps {
   systemMetrics: Metric[];
 }
 
-export function SystemMetrics({ echoMetrics, systemMetrics }: SystemMetricsProps) {
+const colorMap: Record<string, string> = {
+  blue: "text-blue-500",
+  green: "text-green-500",
+  red: "text-red-500",
+  yellow: "text-yellow-500",
+  purple: "text-purple-500",
+  orange: "text-orange-500",
+  gray: "text-gray-500",
+  // Add more as needed
+};
+
+export function SystemMetrics({
+  echoMetrics,
+  systemMetrics,
+}: SystemMetricsProps) {
   // Combine and limit to 4 metrics
   const combinedMetrics = [...echoMetrics, ...systemMetrics].slice(0, 4);
 
@@ -25,7 +39,7 @@ export function SystemMetrics({ echoMetrics, systemMetrics }: SystemMetricsProps
       </h2>
       <div className="space-y-4">
         {combinedMetrics.map((metric, index) => (
-          <motion.div 
+          <motion.div
             key={index}
             className="flex items-center justify-between"
             initial={{ opacity: 0, x: 20 }}
@@ -33,20 +47,26 @@ export function SystemMetrics({ echoMetrics, systemMetrics }: SystemMetricsProps
             transition={{ delay: 1 + index * 0.1 }}
           >
             <div className="flex items-center space-x-3">
-              <metric.icon size={16} className={`text-${metric.color}-500`} />
-              <span className="text-sm text-neutral-700 dark:text-neutral-300">{metric.label}</span>
+              <metric.icon size={16} className={colorMap[metric.color] || "text-gray-500"} />
+              <span className="text-sm text-neutral-700 dark:text-neutral-300">
+                {metric.label}
+              </span>
             </div>
             <div className="flex items-center space-x-2">
               <div className="w-16 bg-neutral-200 dark:bg-neutral-600 rounded-full h-2">
-                <motion.div 
-                  className={`h-2 bg-${metric.color}-500 rounded-full`}
+                <motion.div
+                  className={`h-2 ${
+                    colorMap[metric.color]?.replace("text-", "bg-") ||
+                    "bg-gray-500"
+                  } rounded-full`}
                   initial={{ width: 0 }}
                   animate={{ width: `${metric.value}%` }}
                   transition={{ duration: 1, delay: 1.2 + index * 0.1 }}
                 />
               </div>
               <span className="text-sm font-medium text-neutral-900 dark:text-white min-w-[40px]">
-                {metric.value}{metric.unit}
+                {metric.value}
+                {metric.unit}
               </span>
             </div>
           </motion.div>

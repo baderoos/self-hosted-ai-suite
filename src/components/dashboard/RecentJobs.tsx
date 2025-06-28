@@ -45,6 +45,7 @@ export function RecentJobs({ jobs }: RecentJobsProps) {
               whileHover={{ x: 10 }}
             >
               <div className="flex-shrink-0">
+              <div className="flex-shrink-0">
                 {job.status === 'completed' && (
                   <CheckCircle size={24} className="text-emerald-500" />
                 )}
@@ -59,7 +60,10 @@ export function RecentJobs({ jobs }: RecentJobsProps) {
                 {job.status === 'scheduled' && (
                   <AlertCircle size={24} className="text-blue-500" />
                 )}
-              </div>
++               {!['completed', 'processing', 'scheduled'].includes(job.status) && (
++                 <AlertCircle size={24} className="text-gray-500" />
++               )}
+              </div>              </div>
               <div className="flex-1 min-w-0">
                 <div className="flex items-center space-x-2 mb-1">
                   <p className="text-sm font-medium text-neutral-900 dark:text-white truncate">
@@ -84,12 +88,12 @@ export function RecentJobs({ jobs }: RecentJobsProps) {
                       animate={{ width: `${job.progress}%` }}
                       transition={{ duration: 0.8 }}
                     />
-                  </div>
-                )}
-              </div>
-              <div className="flex-shrink-0">
                 <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium
                   ${job.status === 'completed' ? 'bg-emerald-100 text-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-400' : ''}
+                  ${job.status === 'processing' ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400' : ''}
+                  ${job.status === 'scheduled' ? 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400' : ''}
+                  ${!['completed', 'processing', 'scheduled'].includes(job.status) ? 'bg-gray-100 text-gray-800 dark:bg-gray-900/30 dark:text-gray-400' : ''}
+                `}>                  ${job.status === 'completed' ? 'bg-emerald-100 text-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-400' : ''}
                   ${job.status === 'processing' ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400' : ''}
                   ${job.status === 'scheduled' ? 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400' : ''}
                 `}>

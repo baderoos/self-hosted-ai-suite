@@ -14,26 +14,28 @@ export default function SupabaseAuth() {
   useEffect(() => {
     // Check for existing session on mount
     const checkUser = async () => {
-      const { data: { user } } = await supabase.auth.getUser();
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
       if (user) setUser(user);
     };
     checkUser();
 
     // Listen for auth changes
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      (event, session) => {
-        setUser(session?.user ?? null);
-      }
-    );
-    
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((event, session) => {
+      setUser(session?.user ?? null);
+    });
+
     return () => subscription.unsubscribe();
   }, []);
 
   return (
     <div className="max-w-sm mx-auto p-4 border rounded shadow">
       {user ? (
-        <UserProfile 
-          user={user} 
+        <UserProfile
+          user={user}
           onSignOut={async () => {
             setLoading(true);
             setError("");
@@ -77,7 +79,10 @@ export default function SupabaseAuth() {
             e.preventDefault();
             setLoading(true);
             setError("");
-            const { data, error } = await supabase.auth.signUp({ email, password });
+            const { data, error } = await supabase.auth.signUp({
+              email,
+              password,
+            });
             if (error) {
               setError(error.message);
             } else if (data.user) {
@@ -95,4 +100,3 @@ export default function SupabaseAuth() {
     </div>
   );
 }
-

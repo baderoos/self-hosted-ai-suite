@@ -16,6 +16,36 @@ interface AIAgentStatusProps {
   getAgentStatusColor: (status: string) => string;
 }
 
+// Map agent colors to static Tailwind classes
+const colorClassMap: Record<string, { bg: string; text: string; bar: string }> = {
+  blue: {
+    bg: "bg-blue-100 dark:bg-blue-900/30",
+    text: "text-blue-600 dark:text-blue-400",
+    bar: "bg-blue-500"
+  },
+  green: {
+    bg: "bg-green-100 dark:bg-green-900/30",
+    text: "text-green-600 dark:text-green-400",
+    bar: "bg-green-500"
+  },
+  red: {
+    bg: "bg-red-100 dark:bg-red-900/30",
+    text: "text-red-600 dark:text-red-400",
+    bar: "bg-red-500"
+  },
+  yellow: {
+    bg: "bg-yellow-100 dark:bg-yellow-900/30",
+    text: "text-yellow-600 dark:text-yellow-400",
+    bar: "bg-yellow-500"
+  },
+  purple: {
+    bg: "bg-purple-100 dark:bg-purple-900/30",
+    text: "text-purple-600 dark:text-purple-400",
+    bar: "bg-purple-500"
+  },
+  // Add more colors as needed
+};
+
 export function AIAgentStatus({ agents, getAgentStatusColor }: AIAgentStatusProps) {
   return (
     <motion.div 
@@ -40,8 +70,8 @@ export function AIAgentStatus({ agents, getAgentStatusColor }: AIAgentStatusProp
             >
               <div className="flex items-center justify-between mb-2">
                 <div className="flex items-center space-x-3">
-                  <div className={`p-2 rounded-lg bg-${agent.color}-100 dark:bg-${agent.color}-900/30`}>
-                    <agent.icon size={16} className={`text-${agent.color}-600 dark:text-${agent.color}-400`} />
+                  <div className={`p-2 rounded-lg ${colorClassMap[agent.color]?.bg || 'bg-neutral-100 dark:bg-neutral-900/30'}`}>
+                    <agent.icon size={16} className={`${colorClassMap[agent.color]?.text || 'text-neutral-600 dark:text-neutral-400'}`} />
                   </div>
                   <span className="font-medium text-neutral-900 dark:text-white text-sm">
                     {agent.name}
@@ -70,7 +100,7 @@ export function AIAgentStatus({ agents, getAgentStatusColor }: AIAgentStatusProp
               </div>
               <div className="mt-2 w-full bg-neutral-200 dark:bg-neutral-600 rounded-full h-1">
                 <motion.div 
-                  className={`h-1 rounded-full bg-${agent.color}-500`}
+                  className={`h-1 rounded-full ${colorClassMap[agent.color]?.bar || 'bg-neutral-500'}`}
                   initial={{ width: 0 }}
                   animate={{ width: `${agent.load}%` }}
                   transition={{ duration: 0.8 }}
