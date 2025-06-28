@@ -18,14 +18,13 @@ export default function SupabaseAuth() {
     checkUser();
 
     // Listen for auth changes
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      (event, session) => {
-        setUser(session?.user ?? null);
-      }
-    );
+    const { data } = supabase.auth.onAuthStateChange((event, session) => {
+      setUser(session?.user ?? null);
+    });
 
-    return () => subscription.unsubscribe();
-  }, []);    checkUser();
+    return () => {
+      data?.subscription?.unsubscribe?.();
+    };
   }, []);
 
   const handleSignUp = async (e: React.FormEvent) => {
@@ -72,6 +71,7 @@ export default function SupabaseAuth() {
 
   return (
     <div className="max-w-sm mx-auto p-4 border rounded shadow">
+      {user === null && !loading ? (
         <form onSubmit={handleSignIn}>
           <input
             className="block w-full mb-2 p-2 border rounded"
@@ -104,27 +104,23 @@ export default function SupabaseAuth() {
               Sign Up
             </button>
           </div>
-        </form>          <div className="flex gap-2">
-            <button
-              type="button"
-              onClick={handleSignIn}
-              className="bg-blue-500 text-white px-4 py-2 rounded"
-              disabled={loading}
-            >
-              Sign In
-            </button>
-            <button
-              type="button"
-              onClick={handleSignUp}
-              className="bg-green-500 text-white px-4 py-2 rounded"
-              disabled={loading}
-            >
-              Sign Up
-            </button>
-          </div>
           {error && <p className="text-red-500 mt-2">{error}</p>}
         </form>
+      ) : user ? (
+        <div>
+          <p className="mb-4">Signed in as {user.email}</p>
+          <button
+            onClick={handleSignOut}
+            className="bg-red-500 text-white px-4 py-2 rounded"
+            disabled={loading}
+          >
+            Sign Out
+          </button>
+        </div>
+      ) : (
+        <div className="text-center">Loading...</div>
       )}
     </div>
   );
 }
+
