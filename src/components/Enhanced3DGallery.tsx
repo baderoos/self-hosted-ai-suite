@@ -27,6 +27,7 @@ export function Enhanced3DGallery({ items }: Enhanced3DGalleryProps) {
 
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+      {items.map((item, index) => (
         <Suspense key={item.id} fallback={
           <div className="bg-white/80 dark:bg-neutral-800/80 rounded-2xl border border-neutral-200/50 dark:border-neutral-700/50 overflow-hidden shadow-lg animate-pulse">
             <div className="aspect-video bg-neutral-200 dark:bg-neutral-700"></div>
@@ -191,6 +192,7 @@ export function Enhanced3DGallery({ items }: Enhanced3DGalleryProps) {
             </motion.div>
           </AnimatedCard>
         </Suspense>
+      ))}
       ))}
     </div>
   );
