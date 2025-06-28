@@ -49,6 +49,7 @@ interface WorkspaceContextType {
   cancelInvitation: (invitationId: string) => Promise<void>;
   acceptInvitation: (token: string) => Promise<boolean>;
   refreshWorkspaces: () => Promise<void>;
+  subscription: any | null;
 }
 
 const WorkspaceContext = createContext<WorkspaceContextType | undefined>(undefined);
@@ -65,6 +66,7 @@ export function WorkspaceProvider({ children }: WorkspaceProviderProps) {
   const [invitations, setInvitations] = useState<WorkspaceInvitation[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [subscription, setSubscription] = useState<any | null>(null);
 
   // Load user's workspaces
   useEffect(() => {
@@ -83,10 +85,12 @@ export function WorkspaceProvider({ children }: WorkspaceProviderProps) {
     if (!activeWorkspace) {
       setMembers([]);
       setInvitations([]);
+      setSubscription(null);
       return;
     }
 
     loadWorkspaceMembers();
+    loadWorkspaceSubscription();
     if (['owner', 'admin'].includes(activeWorkspace.role)) {
       loadWorkspaceInvitations();
     }
@@ -150,6 +154,24 @@ export function WorkspaceProvider({ children }: WorkspaceProviderProps) {
       setMembers(formattedMembers);
     } catch (err) {
       console.error('Error loading members:', err);
+    }
+  };
+
+  const loadWorkspaceSubscription = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('subscriptions')
+        .select('*')
+        .eq('workspace_id', activeWorkspace!.id)
+        .single();
+
+      if (error && error.code !== 'PGRST116') {
+        console.error('Error loading subscription:', error);
+      }
+
+      setSubscription(data || null);
+    } catch (err) {
+      console.error('Error loading subscription:', err);
     }
   };
 
@@ -407,6 +429,7 @@ export function WorkspaceProvider({ children }: WorkspaceProviderProps) {
     activeWorkspace,
     members,
     invitations,
+    subscription,
     isLoading,
     error,
     setActiveWorkspace: handleSetActiveWorkspace,
