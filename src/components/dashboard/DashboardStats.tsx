@@ -1,5 +1,6 @@
 import React from 'react';
 import { motion } from 'framer-motion';
+import { colorClassMap } from '../../lib/colorClassMap';
 
 interface StatItem {
   label: string;
@@ -13,41 +14,6 @@ interface StatItem {
 interface DashboardStatsProps {
   stats: StatItem[];
 }
-
-// Map stat colors to static Tailwind classes
-const colorClassMap: Record<string, { bg: string; text: string; darkText: string }> = {
-  blue: {
-    bg: "bg-blue-100 dark:bg-blue-900/30",
-    text: "text-blue-600",
-    darkText: "dark:text-blue-400"
-  },
-  green: {
-    bg: "bg-green-100 dark:bg-green-900/30",
-    text: "text-green-600",
-    darkText: "dark:text-green-400"
-  },
-  red: {
-    bg: "bg-red-100 dark:bg-red-900/30",
-    text: "text-red-600",
-    darkText: "dark:text-red-400"
-  },
-  yellow: {
-    bg: "bg-yellow-100 dark:bg-yellow-900/30",
-    text: "text-yellow-600",
-    darkText: "dark:text-yellow-400"
-  },
-  purple: {
-    bg: "bg-purple-100 dark:bg-purple-900/30",
-    text: "text-purple-600",
-    darkText: "dark:text-purple-400"
-  },
-  orange: {
-    bg: "bg-orange-100 dark:bg-orange-900/30",
-    text: "text-orange-600",
-    darkText: "dark:text-orange-400"
-  },
-  // Add more as needed
-};
 
 export function DashboardStats({ stats }: DashboardStatsProps) {
   return (

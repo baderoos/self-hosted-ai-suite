@@ -69,6 +69,7 @@ export function ConsoleLog({
         <AnimatePresence>
           {logs.map((log) => {
             const LogIcon = getLogIcon(log.type);
+            const associatedTask = tasks.find((task) => task.task_id === log.task_id);
             return (
               <motion.div
                 key={log.id}
@@ -99,12 +100,7 @@ export function ConsoleLog({
                     </div>
                   )}
                 </div>
-                {(() => {
-                  const associatedTask = tasks.find(
-                    (task) => task.task_id === log.task_id
-                  );
-                  return associatedTask?.status === "processing";
-                })() && (
+                {associatedTask?.status === "processing" && (
                   <button
                     onClick={() => onCancelTask(log.task_id)}
                     className="text-red-400 hover:text-red-300 text-xs"
