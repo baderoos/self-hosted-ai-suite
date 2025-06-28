@@ -1,10 +1,11 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import { Brain, Eye, Mic, Video, Share2, Zap, ArrowRight, Play, Sparkles, Store, BarChart3 } from 'lucide-react';
-import { AnimatedBackground } from './AnimatedBackground';
+import { lazy, Suspense } from 'react';
 
-// Lazy load AnimatedCard as it's not needed for initial render
-const AnimatedCard = React.lazy(() => import('./AnimatedCard').then(module => ({ default: module.AnimatedCard })));
+// Lazy load components
+const AnimatedBackground = lazy(() => import('./AnimatedBackground').then(module => ({ default: module.AnimatedBackground })));
+const AnimatedCard = lazy(() => import('./AnimatedCard'));
 
 export function EnhancedHero() {
   const features = [
@@ -59,8 +60,16 @@ export function EnhancedHero() {
   ];
 
   return (
-    <AnimatedBackground intensity="dynamic" theme="neural">
-      <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24 lg:py-32">
+    <Suspense fallback={
+      <div className="min-h-screen bg-gradient-to-br from-neutral-950 via-neutral-900 to-neutral-950 flex items-center justify-center">
+        <div className="text-center">
+          <div className="w-16 h-16 border-4 border-primary-200 border-t-primary-500 rounded-full animate-spin mx-auto mb-4"></div>
+          <p className="text-white">Loading...</p>
+        </div>
+      </div>
+    }>
+      <AnimatedBackground intensity="dynamic" theme="neural">
+        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24 lg:py-32">
         <div className="text-center space-y-8">
           {/* Main Heading */}
           <motion.div
@@ -281,6 +290,7 @@ export function EnhancedHero() {
           </motion.div>
         </div>
       </div>
-    </AnimatedBackground>
+      </AnimatedBackground>
+    </Suspense>
   );
 }

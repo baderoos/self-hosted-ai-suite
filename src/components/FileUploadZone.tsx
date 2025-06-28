@@ -16,7 +16,9 @@ import {
 } from 'lucide-react';
 import { useFileUpload } from '../hooks/useFileUpload';
 import { useAuth } from '../hooks/useAuth';
-import ImageOptimizer from '../services/ImageOptimizer';
+
+// Lazy load the image optimizer
+const ImageOptimizer = lazy(() => import('../services/ImageOptimizer'));
 
 interface FileUploadZoneProps {
   onFileUploaded?: (file: any) => void;
@@ -72,13 +74,17 @@ export function FileUploadZone({
   const optimizeImages = useCallback(async (files: File[]) => {
     setIsOptimizingImages(true);
     
+    // Load the ImageOptimizer dynamically
+    const ImageOptimizerModule = await import('../services/ImageOptimizer');
+    const optimizer = ImageOptimizerModule.default;
+    
     try {
       const optimizedFiles = await Promise.all(
         files.map(async (file) => {
           // Only optimize images
           if (file.type.startsWith('image/')) {
             try {
-              const optimized = await ImageOptimizer.optimizeImage(file, {
+              const optimized = await optimizer.optimizeImage(file, {
                 maxWidth: 1920,
                 maxHeight: 1080,
                 quality: 80,
