@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { memo } from 'react';
 import { motion } from 'framer-motion';
 
 interface AnimatedCardProps {
@@ -84,3 +84,6 @@ export function AnimatedCard({
     </motion.div>
   );
 }
+
+// Memoize the component to prevent unnecessary re-renders
+export default memo(AnimatedCard);

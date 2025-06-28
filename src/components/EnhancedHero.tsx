@@ -2,7 +2,9 @@ import React from 'react';
 import { motion } from 'framer-motion';
 import { Brain, Eye, Mic, Video, Share2, Zap, ArrowRight, Play, Sparkles, Store, BarChart3 } from 'lucide-react';
 import { AnimatedBackground } from './AnimatedBackground';
-import { AnimatedCard } from './AnimatedCard';
+
+// Lazy load AnimatedCard as it's not needed for initial render
+const AnimatedCard = React.lazy(() => import('./AnimatedCard').then(module => ({ default: module.AnimatedCard })));
 
 export function EnhancedHero() {
   const features = [
@@ -141,75 +143,84 @@ export function EnhancedHero() {
           {/* Feature Grid */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-16">
             {features.map((feature, index) => (
-              <AnimatedCard
-                key={index}
-                delay={feature.delay}
-                className="group relative p-6 rounded-2xl bg-white/80 dark:bg-neutral-800/80 backdrop-blur-xl border border-neutral-200/50 dark:border-neutral-700/50 shadow-xl overflow-hidden"
-              >
-                {/* Animated background glow */}
-                <motion.div
-                  className={`absolute inset-0 bg-gradient-to-r ${feature.color} opacity-0 group-hover:opacity-10 transition-opacity duration-500`}
-                  initial={false}
-                />
-                
-                {/* Floating particles on hover */}
-                <motion.div
-                  className="absolute top-2 right-2 w-2 h-2 bg-current rounded-full opacity-0 group-hover:opacity-60"
-                  animate={{
-                    y: [0, -20, 0],
-                    opacity: [0, 0.6, 0]
-                  }}
-                  transition={{
-                    duration: 2,
-                    repeat: Infinity,
-                    delay: index * 0.2
-                  }}
-                />
-                
-                <motion.div 
-                  className={`inline-flex p-3 rounded-xl bg-gradient-to-r ${feature.color} mb-4`}
-                  whileHover={{ 
-                    rotate: 360,
-                    scale: 1.1
-                  }}
-                  transition={{ duration: 0.6, type: "spring" }}
+              <React.Suspense key={index} fallback={
+                <div className="p-6 rounded-2xl bg-white/80 dark:bg-neutral-800/80 backdrop-blur-xl border border-neutral-200/50 dark:border-neutral-700/50 shadow-xl overflow-hidden animate-pulse">
+                  <div className="w-12 h-12 rounded-xl bg-neutral-200 dark:bg-neutral-700 mb-4"></div>
+                  <div className="h-6 bg-neutral-200 dark:bg-neutral-700 rounded mb-2 w-3/4"></div>
+                  <div className="h-4 bg-neutral-200 dark:bg-neutral-700 rounded mb-1 w-full"></div>
+                  <div className="h-4 bg-neutral-200 dark:bg-neutral-700 rounded mb-1 w-5/6"></div>
+                  <div className="h-4 bg-neutral-200 dark:bg-neutral-700 rounded w-4/6"></div>
+                </div>
+              }>
+                <AnimatedCard
+                  delay={feature.delay}
+                  className="group relative p-6 rounded-2xl bg-white/80 dark:bg-neutral-800/80 backdrop-blur-xl border border-neutral-200/50 dark:border-neutral-700/50 shadow-xl overflow-hidden"
                 >
-                  <feature.icon size={24} className="text-white" />
-                </motion.div>
-                
-                <h3 className="text-lg font-semibold text-neutral-900 dark:text-white mb-2 group-hover:text-primary-600 dark:group-hover:text-primary-400 transition-colors">
-                  {feature.title}
-                </h3>
-                <p className="text-neutral-600 dark:text-neutral-400 text-sm leading-relaxed">
-                  {feature.description}
-                </p>
-                
-                {/* Stats */}
-                <motion.div 
-                  className="mt-4 pt-4 border-t border-neutral-200/50 dark:border-neutral-700/50"
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  transition={{ delay: feature.delay + 0.3 }}
-                >
-                  <div className="flex items-center justify-between">
-                    <span className="text-xs text-neutral-500 dark:text-neutral-400">
-                      {feature.stats}
-                    </span>
-                    <motion.div
-                      className="w-2 h-2 bg-emerald-400 rounded-full"
-                      animate={{ 
-                        scale: [1, 1.2, 1],
-                        opacity: [0.5, 1, 0.5]
-                      }}
-                      transition={{ 
-                        duration: 2, 
-                        repeat: Infinity,
-                        delay: index * 0.3
-                      }}
-                    />
-                  </div>
-                </motion.div>
-              </AnimatedCard>
+                  {/* Animated background glow */}
+                  <motion.div
+                    className={`absolute inset-0 bg-gradient-to-r ${feature.color} opacity-0 group-hover:opacity-10 transition-opacity duration-500`}
+                    initial={false}
+                  />
+                  
+                  {/* Floating particles on hover */}
+                  <motion.div
+                    className="absolute top-2 right-2 w-2 h-2 bg-current rounded-full opacity-0 group-hover:opacity-60"
+                    animate={{
+                      y: [0, -20, 0],
+                      opacity: [0, 0.6, 0]
+                    }}
+                    transition={{
+                      duration: 2,
+                      repeat: Infinity,
+                      delay: index * 0.2
+                    }}
+                  />
+                  
+                  <motion.div 
+                    className={`inline-flex p-3 rounded-xl bg-gradient-to-r ${feature.color} mb-4`}
+                    whileHover={{ 
+                      rotate: 360,
+                      scale: 1.1
+                    }}
+                    transition={{ duration: 0.6, type: "spring" }}
+                  >
+                    <feature.icon size={24} className="text-white" />
+                  </motion.div>
+                  
+                  <h3 className="text-lg font-semibold text-neutral-900 dark:text-white mb-2 group-hover:text-primary-600 dark:group-hover:text-primary-400 transition-colors">
+                    {feature.title}
+                  </h3>
+                  <p className="text-neutral-600 dark:text-neutral-400 text-sm leading-relaxed">
+                    {feature.description}
+                  </p>
+                  
+                  {/* Stats */}
+                  <motion.div 
+                    className="mt-4 pt-4 border-t border-neutral-200/50 dark:border-neutral-700/50"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    transition={{ delay: feature.delay + 0.3 }}
+                  >
+                    <div className="flex items-center justify-between">
+                      <span className="text-xs text-neutral-500 dark:text-neutral-400">
+                        {feature.stats}
+                      </span>
+                      <motion.div
+                        className="w-2 h-2 bg-emerald-400 rounded-full"
+                        animate={{ 
+                          scale: [1, 1.2, 1],
+                          opacity: [0.5, 1, 0.5]
+                        }}
+                        transition={{ 
+                          duration: 2, 
+                          repeat: Infinity,
+                          delay: index * 0.3
+                        }}
+                      />
+                    </div>
+                  </motion.div>
+                </AnimatedCard>
+              </React.Suspense>
             ))}
           </div>
 

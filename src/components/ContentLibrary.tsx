@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
-import { Enhanced3DGallery } from './Enhanced3DGallery';
+import { lazy, Suspense } from 'react';
 import { AnimatedCard } from './AnimatedCard';
 import { apiService } from '../services/api';
 import { 
@@ -19,6 +19,9 @@ import {
   Video,
   Sparkles
 } from 'lucide-react';
+
+// Lazy load the Enhanced3DGallery component
+const Enhanced3DGallery = lazy(() => import('./Enhanced3DGallery').then(module => ({ default: module.Enhanced3DGallery })));
 
 export function ContentLibrary() {
   const [viewMode, setViewMode] = useState('grid');
@@ -255,7 +258,22 @@ export function ContentLibrary() {
       {/* Content Grid/List */}
       {!isLoading && (viewMode === 'grid' ? (
 
-        <Enhanced3DGallery items={filteredItems} />
+        <Suspense fallback={
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+            {[...Array(8)].map((_, i) => (
+              <div key={i} className="bg-white/80 dark:bg-neutral-800/80 backdrop-blur-xl rounded-2xl border border-neutral-200/50 dark:border-neutral-700/50 overflow-hidden shadow-lg animate-pulse">
+                <div className="aspect-video bg-neutral-200 dark:bg-neutral-700"></div>
+                <div className="p-4 space-y-2">
+                  <div className="h-5 bg-neutral-200 dark:bg-neutral-700 rounded w-3/4"></div>
+                  <div className="h-4 bg-neutral-200 dark:bg-neutral-700 rounded w-full"></div>
+                  <div className="h-4 bg-neutral-200 dark:bg-neutral-700 rounded w-2/3"></div>
+                </div>
+              </div>
+            ))}
+          </div>
+        }>
+          <Enhanced3DGallery items={filteredItems} />
+        </Suspense>
       ) : (
         <AnimatedCard className="bg-white/80 dark:bg-neutral-800/80 backdrop-blur-xl rounded-2xl border border-neutral-200/50 dark:border-neutral-700/50 overflow-hidden shadow-lg">
           <div className="divide-y divide-neutral-200 dark:divide-neutral-700">

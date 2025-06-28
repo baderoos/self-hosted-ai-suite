@@ -43,11 +43,14 @@ export function useAuth() {
       if (profileError && profileError.code !== 'PGRST116') {
         console.error('Error fetching profile:', profileError);
       }
-
+      
+      // Check if name column exists in the profile
+      const profileName = profileData?.name !== undefined ? profileData?.name : null;
+      
       setUser({
         id: data.user.id,
         email: data.user.email!,
-        name: profileData?.name || null,
+        name: profileName,
         avatar_url: profileData?.avatar_url || null
       });
 
@@ -98,11 +101,14 @@ export function useAuth() {
       if (profileError && profileError.code !== 'PGRST116') {
         console.error('Error fetching profile:', profileError);
       }
+
+      // Check if name column exists in the profile
+      const profileName = profileData?.name !== undefined ? profileData?.name : null;
       
       setUser({
         id: userData.user.id,
         email: userData.user.email!,
-        name: profileData?.name || null,
+        name: profileName,
         avatar_url: profileData?.avatar_url || null
       });
     } catch (err) {
@@ -130,11 +136,14 @@ export function useAuth() {
           if (profileError && profileError.code !== 'PGRST116') {
             console.error('Error fetching profile:', profileError);
           }
+
+          // Check if name column exists in the profile
+          const profileName = profileData?.name !== undefined ? profileData?.name : null;
           
           setUser({
             id: session.user.id,
             email: session.user.email!,
-            name: profileData?.name || null,
+            name: profileName,
             avatar_url: profileData?.avatar_url || null
           });
         }

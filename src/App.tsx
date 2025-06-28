@@ -1,38 +1,44 @@
-import React, { useState } from 'react';
+import React, { useState, lazy, Suspense } from 'react';
 import { EnhancedLayout } from './components/EnhancedLayout';
 import { EnhancedHero } from './components/EnhancedHero';
-import { Dashboard } from './components/Dashboard';
-import { MCPConsole } from './components/MCPConsole';
-import { ContentStudio } from './components/ContentStudio';
-import { ContentLibrary } from './components/ContentLibrary';
-import { NeuralCommandInterface } from './components/NeuralCommandInterface';
-import { VideoTimeline } from './components/VideoTimeline';
-import { AIWorkflowOrchestrator } from './components/AIWorkflowOrchestrator';
-import { ModelHub } from './components/ModelHub';
-import { TheHive } from './components/TheHive';
-import { AIPersona } from './components/AIPersona';
+
+// Lazy load components that aren't needed on initial render
+const Dashboard = lazy(() => import('./components/Dashboard').then(module => ({ default: module.Dashboard })));
+const MCPConsole = lazy(() => import('./components/MCPConsole').then(module => ({ default: module.MCPConsole })));
+const ContentStudio = lazy(() => import('./components/ContentStudio').then(module => ({ default: module.ContentStudio })));
+const ContentLibrary = lazy(() => import('./components/ContentLibrary').then(module => ({ default: module.ContentLibrary })));
+const NeuralCommandInterface = lazy(() => import('./components/NeuralCommandInterface').then(module => ({ default: module.NeuralCommandInterface })));
+const VideoTimeline = lazy(() => import('./components/VideoTimeline').then(module => ({ default: module.VideoTimeline })));
+const AIWorkflowOrchestrator = lazy(() => import('./components/AIWorkflowOrchestrator').then(module => ({ default: module.AIWorkflowOrchestrator })));
+const ModelHub = lazy(() => import('./components/ModelHub').then(module => ({ default: module.ModelHub })));
+const TheHive = lazy(() => import('./components/TheHive').then(module => ({ default: module.TheHive })));
+const AIPersona = lazy(() => import('./components/AIPersona').then(module => ({ default: module.AIPersona })));
+
 import { PersonaProvider } from './components/PersonaProvider';
 import { NexusProvider } from './core/NexusContext';
 import { WorkspaceProvider } from './contexts/WorkspaceContext';
 import { WorkspaceSelector } from './components/WorkspaceSelector';
 import { LoginForm } from './components/LoginForm';
 import { LoadingAnimation } from './components/LoadingAnimation';
-import { useAuth } from './hooks/useAuth';
-import { useWebSocket } from './hooks/useWebSocket';
 import { CommandAction } from './components/CommandPalette';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Sidebar } from './components/Sidebar';
 import { MobileNav } from './components/MobileNav';
-import { VideoTimelinePage } from './pages/VideoTimelinePage';
-import { FileUploadPage } from './pages/FileUploadPage';
-import { SettingsPage } from './pages/SettingsPage';
-import { SocialCommandPage } from './pages/SocialCommandPage';
-import { Marketplace } from './modules/Strategy/Marketplace';
-import { Analytics } from './modules/Social/Analytics';
-import { SupportCenter } from './modules/Support/SupportCenter';
-import { TeamSettingsPage } from './pages/TeamSettingsPage';
-import { BillingPage } from './pages/BillingPage';
-import { WorkspaceSettingsPage } from './pages/WorkspaceSettingsPage';
+import { useAuth } from './hooks/useAuth';
+import { useWebSocket } from './hooks/useWebSocket';
+
+// Lazy load pages
+const VideoTimelinePage = lazy(() => import('./pages/VideoTimelinePage').then(module => ({ default: module.VideoTimelinePage })));
+const FileUploadPage = lazy(() => import('./pages/FileUploadPage').then(module => ({ default: module.FileUploadPage })));
+const SettingsPage = lazy(() => import('./pages/SettingsPage').then(module => ({ default: module.SettingsPage })));
+const SocialCommandPage = lazy(() => import('./pages/SocialCommandPage').then(module => ({ default: module.SocialCommandPage })));
+const Marketplace = lazy(() => import('./modules/Strategy/Marketplace').then(module => ({ default: module.Marketplace })));
+const Analytics = lazy(() => import('./modules/Social/Analytics').then(module => ({ default: module.Analytics })));
+const SupportCenter = lazy(() => import('./modules/Support/SupportCenter').then(module => ({ default: module.SupportCenter })));
+const TeamSettingsPage = lazy(() => import('./pages/TeamSettingsPage').then(module => ({ default: module.TeamSettingsPage })));
+const BillingPage = lazy(() => import('./pages/BillingPage').then(module => ({ default: module.BillingPage })));
+const WorkspaceSettingsPage = lazy(() => import('./pages/WorkspaceSettingsPage').then(module => ({ default: module.WorkspaceSettingsPage })));
+
 import { 
   Home, 
   Brain,
@@ -404,73 +410,149 @@ function App() {
   const renderContent = () => {
     switch (currentView) {
       case 'home':
-        return <EnhancedHero />;
+        return <EnhancedHero />; // Keep this non-lazy as it's the landing page
       case 'dashboard':
-        return <Dashboard />;
+        return (
+          <Suspense fallback={<LoadingAnimation message="Loading Dashboard..." />}>
+            <Dashboard />
+          </Suspense>
+        );
       case 'neural':
-        return <NeuralCommandInterface />;
+        return (
+          <Suspense fallback={<LoadingAnimation message="Loading Neural Interface..." />}>
+            <NeuralCommandInterface />
+          </Suspense>
+        );
       case 'workflow':
-        return <AIWorkflowOrchestrator />;
+        return (
+          <Suspense fallback={<LoadingAnimation message="Loading Workflow Orchestrator..." />}>
+            <AIWorkflowOrchestrator />
+          </Suspense>
+        );
       case 'models':
-        return <ModelHub />;
+        return (
+          <Suspense fallback={<LoadingAnimation message="Loading Model Hub..." />}>
+            <ModelHub />
+          </Suspense>
+        );
       case 'marketplace':
-        return <Marketplace />;
+        return (
+          <Suspense fallback={<LoadingAnimation message="Loading Marketplace..." />}>
+            <Marketplace />
+          </Suspense>
+        );
       case 'hive':
-        return <TheHive />;
+        return (
+          <Suspense fallback={<LoadingAnimation message="Loading The Hive..." />}>
+            <TheHive />
+          </Suspense>
+        );
       case 'mcp':
-        return <MCPConsole />;
+        return (
+          <Suspense fallback={<LoadingAnimation message="Loading MCP Console..." />}>
+            <MCPConsole />
+          </Suspense>
+        );
       case 'studio':
-        return <ContentStudio />;
+        return (
+          <Suspense fallback={<LoadingAnimation message="Loading Content Studio..." />}>
+            <ContentStudio />
+          </Suspense>
+        );
       case 'timeline':
-        return <VideoTimelinePage 
-          clips={timelineClips}
-          duration={200}
-          currentTime={currentTime}
-          isPlaying={isPlaying}
-          onPlay={() => setIsPlaying(true)}
-          onPause={() => setIsPlaying(false)}
-          onSeek={setCurrentTime}
-          onClipAdd={(clip) => {
-            const newClip = {
-              id: Date.now().toString(),
-              type: clip.type || 'video',
-              name: clip.name || 'New Clip',
-              duration: clip.duration || 30,
-              startTime: clip.startTime || currentTime,
-              endTime: (clip.startTime || currentTime) + (clip.duration || 30),
-              track: clip.track || 0
-            };
-            setTimelineClips(prev => [...prev, newClip]);
-          }}
-          onClipEdit={(clipId, updates) => {
-            setTimelineClips(prev => prev.map(clip => 
-              clip.id === clipId ? { ...clip, ...updates } : clip
-            ));
-          }}
-          onClipDelete={(clipId) => {
-            setTimelineClips(prev => prev.filter(clip => clip.id !== clipId));
-          }}
-        />;
+        return (
+          <Suspense fallback={<LoadingAnimation message="Loading Video Timeline..." />}>
+            <VideoTimelinePage 
+              clips={timelineClips}
+              duration={200}
+              currentTime={currentTime}
+              isPlaying={isPlaying}
+              onPlay={() => setIsPlaying(true)}
+              onPause={() => setIsPlaying(false)}
+              onSeek={setCurrentTime}
+              onClipAdd={(clip) => {
+                const newClip = {
+                  id: Date.now().toString(),
+                  type: clip.type || 'video',
+                  name: clip.name || 'New Clip',
+                  duration: clip.duration || 30,
+                  startTime: clip.startTime || currentTime,
+                  endTime: (clip.startTime || currentTime) + (clip.duration || 30),
+                  track: clip.track || 0
+                };
+                setTimelineClips(prev => [...prev, newClip]);
+              }}
+              onClipEdit={(clipId, updates) => {
+                setTimelineClips(prev => prev.map(clip => 
+                  clip.id === clipId ? { ...clip, ...updates } : clip
+                ));
+              }}
+              onClipDelete={(clipId) => {
+                setTimelineClips(prev => prev.filter(clip => clip.id !== clipId));
+              }}
+            />
+          </Suspense>
+        );
       case 'library':
-        return <ContentLibrary />;
+        return (
+          <Suspense fallback={<LoadingAnimation message="Loading Content Library..." />}>
+            <ContentLibrary />
+          </Suspense>
+        );
       case 'upload':
-        return <FileUploadPage />;
+        return (
+          <Suspense fallback={<LoadingAnimation message="Loading File Upload..." />}>
+            <FileUploadPage />
+          </Suspense>
+        );
       case 'social':
-        return <SocialCommandPage />;
+        return (
+          <Suspense fallback={<LoadingAnimation message="Loading Social Command..." />}>
+            <SocialCommandPage />
+          </Suspense>
+        );
       case 'analytics':
-        return <Analytics />;
+        return (
+          <Suspense fallback={<LoadingAnimation message="Loading Analytics..." />}>
+            <Analytics />
+          </Suspense>
+        );
       case 'support':
-        return <SupportCenter />;
+        return (
+          <Suspense fallback={<LoadingAnimation message="Loading Support Center..." />}>
+            <SupportCenter />
+          </Suspense>
+        );
       case 'team':
-        return <TeamSettingsPage />;
+        return (
+          <Suspense fallback={<LoadingAnimation message="Loading Team Settings..." />}>
+            <TeamSettingsPage />
+          </Suspense>
+        );
       case 'billing':
-        return <BillingPage />;
+        return (
+          <Suspense fallback={<LoadingAnimation message="Loading Billing..." />}>
+            <BillingPage />
+          </Suspense>
+        );
       case 'workspace':
-        return <WorkspaceSettingsPage />;
+        return (
+          <Suspense fallback={<LoadingAnimation message="Loading Workspace Settings..." />}>
+            <WorkspaceSettingsPage />
+          </Suspense>
+        );
       case 'settings':
-        return <SettingsPage />;
+        return (
+          <Suspense fallback={<LoadingAnimation message="Loading Settings..." />}>
+            <SettingsPage />
+          </Suspense>
+        );
       case 'persona':
-        return <AIPersona />;
+        return (
+          <Suspense fallback={<LoadingAnimation message="Loading AI Persona..." />}>
+            <AIPersona />
+          </Suspense>
+        );
       default:
         return <EnhancedHero />;
     }
