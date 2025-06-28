@@ -1,11 +1,6 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import { Brain, Eye, Mic, Video, Share2, Zap, ArrowRight, Play, Sparkles, Store, BarChart3 } from 'lucide-react';
-import { lazy, Suspense } from 'react';
-
-// Lazy load components
-const AnimatedBackground = lazy(() => import('./AnimatedBackground').then(module => ({ default: module.AnimatedBackground })));
-const AnimatedCard = lazy(() => import('./AnimatedCard').then(module => ({ default: module.AnimatedCard })));
 
 export function EnhancedHero() {
   const features = [
@@ -60,16 +55,7 @@ export function EnhancedHero() {
   ];
 
   return (
-    <Suspense fallback={
-      <div className="min-h-screen bg-gradient-to-br from-neutral-950 via-neutral-900 to-neutral-950 flex items-center justify-center">
-        <div className="text-center">
-          <div className="w-16 h-16 border-4 border-primary-200 border-t-primary-500 rounded-full animate-spin mx-auto mb-4"></div>
-          <p className="text-white">Loading...</p>
-        </div>
-      </div>
-    }>
-      <AnimatedBackground intensity="dynamic" theme="neural">
-        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24 lg:py-32">
+    <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24 lg:py-32 bg-gradient-to-br from-neutral-50 to-neutral-100 dark:from-neutral-950 dark:to-neutral-900">
         <div className="text-center space-y-8">
           {/* Main Heading */}
           <motion.div
@@ -152,19 +138,13 @@ export function EnhancedHero() {
           {/* Feature Grid */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-16">
             {features.map((feature, index) => (
-              <React.Suspense key={index} fallback={
-                <div className="p-6 rounded-2xl bg-white/80 dark:bg-neutral-800/80 backdrop-blur-xl border border-neutral-200/50 dark:border-neutral-700/50 shadow-xl overflow-hidden animate-pulse">
-                  <div className="w-12 h-12 rounded-xl bg-neutral-200 dark:bg-neutral-700 mb-4"></div>
-                  <div className="h-6 bg-neutral-200 dark:bg-neutral-700 rounded mb-2 w-3/4"></div>
-                  <div className="h-4 bg-neutral-200 dark:bg-neutral-700 rounded mb-1 w-full"></div>
-                  <div className="h-4 bg-neutral-200 dark:bg-neutral-700 rounded mb-1 w-5/6"></div>
-                  <div className="h-4 bg-neutral-200 dark:bg-neutral-700 rounded w-4/6"></div>
-                </div>
-              }>
-                <AnimatedCard
-                  delay={feature.delay}
-                  className="group relative p-6 rounded-2xl bg-white/80 dark:bg-neutral-800/80 backdrop-blur-xl border border-neutral-200/50 dark:border-neutral-700/50 shadow-xl overflow-hidden"
-                >
+              <motion.div
+                key={index}
+                className="group relative p-6 rounded-2xl bg-white/80 dark:bg-neutral-800/80 backdrop-blur-xl border border-neutral-200/50 dark:border-neutral-700/50 shadow-xl overflow-hidden"
+                initial={{ opacity: 0, y: 50 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6, delay: feature.delay }}
+              >
                   {/* Animated background glow */}
                   <motion.div
                     className={`absolute inset-0 bg-gradient-to-r ${feature.color} opacity-0 group-hover:opacity-10 transition-opacity duration-500`}
@@ -228,8 +208,7 @@ export function EnhancedHero() {
                       />
                     </div>
                   </motion.div>
-                </AnimatedCard>
-              </React.Suspense>
+              </motion.div>
             ))}
           </div>
 
@@ -289,8 +268,6 @@ export function EnhancedHero() {
             </motion.button>
           </motion.div>
         </div>
-      </div>
-      </AnimatedBackground>
-    </Suspense>
+    </div>
   );
 }

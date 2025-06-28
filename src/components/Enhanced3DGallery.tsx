@@ -1,10 +1,6 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Eye, Download, Share2, Trash2, Calendar, Tag } from 'lucide-react';
-import { lazy, Suspense } from 'react';
-
-// Lazy load AnimatedCard
-const AnimatedCard = lazy(() => import('./AnimatedCard').then(module => ({ default: module.AnimatedCard })));
 
 interface ContentItem {
   id: string;
@@ -28,21 +24,13 @@ export function Enhanced3DGallery({ items }: Enhanced3DGalleryProps) {
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
       {items.map((item, index) => (
-        <Suspense key={item.id} fallback={
-          <div className="bg-white/80 dark:bg-neutral-800/80 rounded-2xl border border-neutral-200/50 dark:border-neutral-700/50 overflow-hidden shadow-lg animate-pulse">
-            <div className="aspect-video bg-neutral-200 dark:bg-neutral-700"></div>
-            <div className="p-4 space-y-2">
-              <div className="h-5 bg-neutral-200 dark:bg-neutral-700 rounded w-3/4"></div>
-              <div className="h-4 bg-neutral-200 dark:bg-neutral-700 rounded w-full"></div>
-              <div className="h-4 bg-neutral-200 dark:bg-neutral-700 rounded w-2/3"></div>
-            </div>
-          </div>
-        }>
-          <AnimatedCard
-            key={item.id}
-            delay={index * 0.1}
-            className="group relative"
-          >
+        <motion.div
+          key={item.id}
+          className="group relative"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.3, delay: index * 0.1 }}
+        >
             <motion.div
               className="bg-white/80 dark:bg-neutral-800/80 backdrop-blur-xl rounded-2xl border border-neutral-200/50 dark:border-neutral-700/50 overflow-hidden shadow-lg"
               onHoverStart={() => setHoveredItem(item.id)}
@@ -190,8 +178,7 @@ export function Enhanced3DGallery({ items }: Enhanced3DGalleryProps) {
                 )}
               </div>
             </motion.div>
-          </AnimatedCard>
-        </Suspense>
+        </motion.div>
       ))}
     </div>
   );

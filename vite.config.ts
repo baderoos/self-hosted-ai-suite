@@ -14,7 +14,7 @@ export default defineConfig({
     }),
   ],
   optimizeDeps: {
-    exclude: ['lucide-react'],
+    exclude: [],
   },
   server: {
     https: false,
@@ -35,9 +35,7 @@ export default defineConfig({
       output: {
         manualChunks: {
           'react-vendor': ['react', 'react-dom'],
-          'framer-motion': ['framer-motion'],
-          'three-vendor': ['three'],
-          'three-react': ['@react-three/fiber', '@react-three/drei'],
+          'framer-motion': ['framer-motion'], 
           'lucide': ['lucide-react'],
           'supabase': ['@supabase/supabase-js'],
           'utils': ['./src/lib/colorClassMap.ts', './src/lib/apiClient.ts', './src/lib/supabaseClient.ts'],
