@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Eye, Download, Share2, Trash2, Calendar, Tag } from 'lucide-react';
-import React, { lazy, Suspense } from 'react';
+import { lazy, Suspense } from 'react';
 
 // Lazy load AnimatedCard
 const AnimatedCard = lazy(() => import('./AnimatedCard').then(module => ({ default: module.AnimatedCard })));
@@ -192,7 +192,6 @@ export function Enhanced3DGallery({ items }: Enhanced3DGalleryProps) {
             </motion.div>
           </AnimatedCard>
         </Suspense>
-      ))}
       ))}
     </div>
   );
