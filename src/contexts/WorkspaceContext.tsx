@@ -127,33 +127,52 @@ export function WorkspaceProvider({ children }: WorkspaceProviderProps) {
   const loadWorkspaceMembers = async () => {
     try {
       const { data, error } = await supabase
-        .from('workspace_members')
+        .from('workspace_members as wm')
         .select(`
-          user_id,
-          role,
-          created_at,
-          users:user_id (
-            email,
+          wm.user_id,
+          wm.role,
+          wm.created_at,
+          profiles:profiles!user_id (
             name,
             avatar_url
+          ),
+          users:auth.users!user_id (
+            email
           )
         `)
-        .eq('workspace_id', activeWorkspace!.id);
+        .eq('wm.workspace_id', activeWorkspace!.id);
 
       if (error) throw error;
 
       const formattedMembers = data.map(item => ({
         id: item.user_id,
-        email: item.users.email,
-        name: item.users.name,
+        email: item.users?.email || '',
+        name: item.profiles?.name || null,
         role: item.role,
-        avatar_url: item.users.avatar_url,
+        avatar_url: item.profiles?.avatar_url || null,
         joined_at: item.created_at
       }));
 
       setMembers(formattedMembers);
     } catch (err) {
       console.error('Error loading members:', err);
+      // Fallback query without joins if the above fails
+      try {
+        // Simpler query without complex joins
+        const { data: membersData, error: membersError } = await supabase.rpc(
+          'get_workspace_members',
+          { workspace_uuid: activeWorkspace!.id }
+        );
+
+        if (membersError) throw membersError;
+
+        // Use the RPC result directly
+        if (membersData) {
+          setMembers(membersData);
+        }
+      } catch (fallbackErr) {
+        console.error('Fallback member loading also failed:', fallbackErr);
+      }
     }
   };
 

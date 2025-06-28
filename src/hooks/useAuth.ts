@@ -37,13 +37,13 @@ export function useAuth() {
       const { data: profileData, error: profileError } = await supabase
         .from('profiles')
         .select('name, avatar_url')
-        .eq('id', data.user.id)
-        .single();
+        .eq('user_id', user.id)
+        .maybeSingle();
 
       if (profileError && profileError.code !== 'PGRST116') {
         console.error('Error fetching profile:', profileError);
       }
-
+      
       setUser({
         id: data.user.id,
         email: data.user.email!,
@@ -93,16 +93,19 @@ export function useAuth() {
         .from('profiles')
         .select('name, avatar_url')
         .eq('id', userData.user.id)
-        .single();
+        .maybeSingle();
         
       if (profileError && profileError.code !== 'PGRST116') {
         console.error('Error fetching profile:', profileError);
       }
+
+      // Check if name column exists in the profile
+      const profileName = profileData?.name !== undefined ? profileData?.name : null;
       
       setUser({
         id: userData.user.id,
         email: userData.user.email!,
-        name: profileData?.name || null,
+        name: profileName,
         avatar_url: profileData?.avatar_url || null
       });
     } catch (err) {
@@ -125,16 +128,19 @@ export function useAuth() {
             .from('profiles')
             .select('name, avatar_url')
             .eq('id', session.user.id)
-            .single();
+            .maybeSingle();
             
           if (profileError && profileError.code !== 'PGRST116') {
             console.error('Error fetching profile:', profileError);
           }
+
+          // Check if name column exists in the profile
+          const profileName = profileData?.name !== undefined ? profileData?.name : null;
           
           setUser({
             id: session.user.id,
             email: session.user.email!,
-            name: profileData?.name || null,
+            name: profileName,
             avatar_url: profileData?.avatar_url || null
           });
         }
@@ -191,9 +197,8 @@ export function useAuth() {
             .from('profiles')
             .insert([
               {
-                id: data.user.id,
-                name,
-                email
+                user_id: data.user.id,
+                name
               }
             ]);
             
@@ -226,7 +231,7 @@ export function useAuth() {
       const { error } = await supabase
         .from('profiles')
         .update(updates)
-        .eq('id', user.id);
+        .eq('user_id', user.id);
         
       if (error) throw error;
       

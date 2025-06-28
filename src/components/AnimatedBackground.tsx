@@ -12,6 +12,17 @@ export function AnimatedBackground({
   intensity = 'subtle', 
   theme = 'default' 
 }: AnimatedBackgroundProps) {
+  // Safe window dimensions with fallbacks
+  const getWindowDimensions = () => {
+    if (typeof window === 'undefined') {
+      return { width: 1920, height: 1080 }; // Default fallback dimensions
+    }
+    return {
+      width: window.innerWidth || 1920,
+      height: window.innerHeight || 1080
+    };
+  };
+
   const getBackgroundPattern = () => {
     switch (theme) {
       case 'neural':
@@ -30,6 +41,8 @@ export function AnimatedBackground({
       default: return 20;
     }
   };
+
+  const { width, height } = getWindowDimensions();
   
   return (
     <div className="relative w-full h-full">
@@ -48,12 +61,12 @@ export function AnimatedBackground({
               key={i}
               className="absolute w-1 h-1 bg-primary-500/30 rounded-full"
               initial={{
-                x: Math.random() * window.innerWidth,
-                y: Math.random() * window.innerHeight,
+                x: Math.random() * width,
+                y: Math.random() * height,
               }}
               animate={{
-                x: Math.random() * window.innerWidth,
-                y: Math.random() * window.innerHeight,
+                x: Math.random() * width,
+                y: Math.random() * height,
               }}
               transition={{
                 duration: 10 + Math.random() * 20,
@@ -73,12 +86,12 @@ export function AnimatedBackground({
                 key={`effect-${i}`}
                 className="absolute w-32 h-32 bg-gradient-to-r from-primary-500/10 to-secondary-500/10 rounded-full blur-xl"
                 initial={{
-                  x: Math.random() * window.innerWidth,
-                  y: Math.random() * window.innerHeight,
+                  x: Math.random() * width,
+                  y: Math.random() * height,
                 }}
                 animate={{
-                  x: Math.random() * window.innerWidth,
-                  y: Math.random() * window.innerHeight,
+                  x: Math.random() * width,
+                  y: Math.random() * height,
                   scale: [1, 1.5, 1],
                 }}
                 transition={{

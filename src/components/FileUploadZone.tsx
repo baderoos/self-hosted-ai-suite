@@ -1,5 +1,6 @@
 import React, { useCallback, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { lazy, Suspense } from 'react';
 import { 
   Upload, 
   File, 
@@ -16,6 +17,9 @@ import {
 import { useFileUpload } from '../hooks/useFileUpload';
 import { useAuth } from '../hooks/useAuth';
 
+// Lazy load the image optimizer
+const ImageOptimizer = lazy(() => import('../services/ImageOptimizer'));
+
 interface FileUploadZoneProps {
   onFileUploaded?: (file: any) => void;
   acceptedTypes?: string[];
@@ -31,6 +35,7 @@ export function FileUploadZone({
 }: FileUploadZoneProps) {
   const [isDragOver, setIsDragOver] = useState(false);
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
+  const [isOptimizingImages, setIsOptimizingImages] = useState(false);
   const { 
     isUploading, 
     uploadProgress, 
@@ -55,7 +60,7 @@ export function FileUploadZone({
   const handleDrop = useCallback((e: React.DragEvent) => {
     e.preventDefault();
     setIsDragOver(false);
-    
+
     const files = Array.from(e.dataTransfer.files);
     setSelectedFiles(files.slice(0, maxFiles));
   }, [maxFiles]);
@@ -65,11 +70,54 @@ export function FileUploadZone({
     setSelectedFiles(files.slice(0, maxFiles));
   }, [maxFiles]);
 
+  // Optimize images before upload
+  const optimizeImages = useCallback(async (files: File[]) => {
+    setIsOptimizingImages(true);
+    
+    // Load the ImageOptimizer dynamically
+    const ImageOptimizerModule = await import('../services/ImageOptimizer');
+    const optimizer = ImageOptimizerModule.default;
+    
+    try {
+      const optimizedFiles = await Promise.all(
+        files.map(async (file) => {
+          // Only optimize images
+          if (file.type.startsWith('image/')) {
+            try {
+              const optimized = await optimizer.optimizeImage(file, {
+                maxWidth: 1920,
+                maxHeight: 1080,
+                quality: 80,
+                format: 'webp'
+              });
+              
+              console.log(`Optimized ${file.name}: ${(file.size / 1024).toFixed(2)}KB → ${(optimized.file.size / 1024).toFixed(2)}KB (${Math.round((1 - optimized.file.size / file.size) * 100)}% reduction)`);
+              
+              return optimized.file;
+            } catch (err) {
+              console.error(`Failed to optimize ${file.name}:`, err);
+              return file; // Return original file if optimization fails
+            }
+          }
+          
+          return file; // Return non-image files as-is
+        })
+      );
+      
+      return optimizedFiles;
+    } finally {
+      setIsOptimizingImages(false);
+    }
+  }, []);
+
   const handleUpload = useCallback(async () => {
     if (!selectedFiles.length || !canWrite()) return;
 
     try {
-      const result = await uploadMultipleFiles(selectedFiles);
+      // Optimize images before upload
+      const filesToUpload = await optimizeImages(selectedFiles);
+      
+      const result = await uploadMultipleFiles(filesToUpload);
       setSelectedFiles([]);
       
       if (onFileUploaded) {
@@ -78,7 +126,7 @@ export function FileUploadZone({
     } catch (err) {
       console.error('Upload failed:', err);
     }
-  }, [selectedFiles, uploadMultipleFiles, onFileUploaded, canWrite]);
+  }, [selectedFiles, optimizeImages, uploadMultipleFiles, onFileUploaded, canWrite]);
 
   const removeSelectedFile = useCallback((index: number) => {
     setSelectedFiles(prev => prev.filter((_, i) => i !== index));
@@ -193,13 +241,17 @@ export function FileUploadZone({
               </h4>
               <motion.button
                 onClick={handleUpload}
-                disabled={isUploading}
+                disabled={isUploading || isOptimizingImages}
                 className="px-4 py-2 bg-gradient-to-r from-primary-600 to-secondary-600 text-white font-medium rounded-lg hover:from-primary-700 hover:to-secondary-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 flex items-center space-x-2"
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
               >
                 <Cloud size={16} />
-                <span>{isUploading ? 'Uploading to Cloud...' : 'Upload to Cloud'}</span>
+                <span>
+                  {isOptimizingImages ? 'Optimizing Images...' : 
+                   isUploading ? 'Uploading to Cloud...' : 
+                   'Upload to Cloud'}
+                </span>
               </motion.button>
             </div>
 

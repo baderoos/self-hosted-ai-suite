@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
-import { Enhanced3DGallery } from './Enhanced3DGallery';
 import { AnimatedCard } from './AnimatedCard';
 import { apiService } from '../services/api';
 import { 
@@ -17,8 +16,12 @@ import {
   FileText,
   Image,
   Video,
-  Sparkles
+  Sparkles,
+  Grid3X3,
+  List
 } from 'lucide-react';
+
+import { Enhanced3DGallery } from './Enhanced3DGallery';
 
 export function ContentLibrary() {
   const [viewMode, setViewMode] = useState('grid');
@@ -254,7 +257,6 @@ export function ContentLibrary() {
 
       {/* Content Grid/List */}
       {!isLoading && (viewMode === 'grid' ? (
-
         <Enhanced3DGallery items={filteredItems} />
       ) : (
         <AnimatedCard className="bg-white/80 dark:bg-neutral-800/80 backdrop-blur-xl rounded-2xl border border-neutral-200/50 dark:border-neutral-700/50 overflow-hidden shadow-lg">

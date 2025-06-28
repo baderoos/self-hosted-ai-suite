@@ -1,8 +1,6 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import { Brain, Eye, Mic, Video, Share2, Zap, ArrowRight, Play, Sparkles, Store, BarChart3 } from 'lucide-react';
-import { AnimatedBackground } from './AnimatedBackground';
-import { AnimatedCard } from './AnimatedCard';
 
 export function EnhancedHero() {
   const features = [
@@ -57,8 +55,7 @@ export function EnhancedHero() {
   ];
 
   return (
-    <AnimatedBackground intensity="dynamic" theme="neural">
-      <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24 lg:py-32">
+    <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24 lg:py-32 bg-gradient-to-br from-neutral-50 to-neutral-100 dark:from-neutral-950 dark:to-neutral-900">
         <div className="text-center space-y-8">
           {/* Main Heading */}
           <motion.div
@@ -141,75 +138,77 @@ export function EnhancedHero() {
           {/* Feature Grid */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-16">
             {features.map((feature, index) => (
-              <AnimatedCard
+              <motion.div
                 key={index}
-                delay={feature.delay}
                 className="group relative p-6 rounded-2xl bg-white/80 dark:bg-neutral-800/80 backdrop-blur-xl border border-neutral-200/50 dark:border-neutral-700/50 shadow-xl overflow-hidden"
+                initial={{ opacity: 0, y: 50 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6, delay: feature.delay }}
               >
-                {/* Animated background glow */}
-                <motion.div
-                  className={`absolute inset-0 bg-gradient-to-r ${feature.color} opacity-0 group-hover:opacity-10 transition-opacity duration-500`}
-                  initial={false}
-                />
-                
-                {/* Floating particles on hover */}
-                <motion.div
-                  className="absolute top-2 right-2 w-2 h-2 bg-current rounded-full opacity-0 group-hover:opacity-60"
-                  animate={{
-                    y: [0, -20, 0],
-                    opacity: [0, 0.6, 0]
-                  }}
-                  transition={{
-                    duration: 2,
-                    repeat: Infinity,
-                    delay: index * 0.2
-                  }}
-                />
-                
-                <motion.div 
-                  className={`inline-flex p-3 rounded-xl bg-gradient-to-r ${feature.color} mb-4`}
-                  whileHover={{ 
-                    rotate: 360,
-                    scale: 1.1
-                  }}
-                  transition={{ duration: 0.6, type: "spring" }}
-                >
-                  <feature.icon size={24} className="text-white" />
-                </motion.div>
-                
-                <h3 className="text-lg font-semibold text-neutral-900 dark:text-white mb-2 group-hover:text-primary-600 dark:group-hover:text-primary-400 transition-colors">
-                  {feature.title}
-                </h3>
-                <p className="text-neutral-600 dark:text-neutral-400 text-sm leading-relaxed">
-                  {feature.description}
-                </p>
-                
-                {/* Stats */}
-                <motion.div 
-                  className="mt-4 pt-4 border-t border-neutral-200/50 dark:border-neutral-700/50"
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  transition={{ delay: feature.delay + 0.3 }}
-                >
-                  <div className="flex items-center justify-between">
-                    <span className="text-xs text-neutral-500 dark:text-neutral-400">
-                      {feature.stats}
-                    </span>
-                    <motion.div
-                      className="w-2 h-2 bg-emerald-400 rounded-full"
-                      animate={{ 
-                        scale: [1, 1.2, 1],
-                        opacity: [0.5, 1, 0.5]
-                      }}
-                      transition={{ 
-                        duration: 2, 
-                        repeat: Infinity,
-                        delay: index * 0.3
-                      }}
-                    />
-                  </div>
-                </motion.div>
-              </AnimatedCard>
+                  {/* Animated background glow */}
+                  <motion.div
+                    className={`absolute inset-0 bg-gradient-to-r ${feature.color} opacity-0 group-hover:opacity-10 transition-opacity duration-500`}
+                    initial={false}
+                  />
+                  
+                  {/* Floating particles on hover */}
+                  <motion.div
+                    className="absolute top-2 right-2 w-2 h-2 bg-current rounded-full opacity-0 group-hover:opacity-60"
+                    animate={{
+                      y: [0, -20, 0],
+                      opacity: [0, 0.6, 0]
+                    }}
+                    transition={{
+                      duration: 2,
+                      repeat: Infinity,
+                      delay: index * 0.2
+                    }}
+                  />
+                  
+                  <motion.div 
+                    className={`inline-flex p-3 rounded-xl bg-gradient-to-r ${feature.color} mb-4`}
+                    whileHover={{ 
+                      rotate: 360,
+                      scale: 1.1
+                    }}
+                    transition={{ duration: 0.6, type: "spring" }}
+                  >
+                    <feature.icon size={24} className="text-white" />
+                  </motion.div>
+                  
+                  <h3 className="text-lg font-semibold text-neutral-900 dark:text-white mb-2 group-hover:text-primary-600 dark:group-hover:text-primary-400 transition-colors">
+                    {feature.title}
+                  </h3>
+                  <p className="text-neutral-600 dark:text-neutral-400 text-sm leading-relaxed">
+                    {feature.description}
+                  </p>
+                  
+                  {/* Stats */}
+                  <motion.div 
+                    className="mt-4 pt-4 border-t border-neutral-200/50 dark:border-neutral-700/50"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    transition={{ delay: feature.delay + 0.3 }}
+                  >
+                    <div className="flex items-center justify-between">
+                      <span className="text-xs text-neutral-500 dark:text-neutral-400">
+                        {feature.stats}
+                      </span>
+                      <motion.div
+                        className="w-2 h-2 bg-emerald-400 rounded-full"
+                        animate={{ 
+                          scale: [1, 1.2, 1],
+                          opacity: [0.5, 1, 0.5]
+                        }}
+                        transition={{ 
+                          duration: 2, 
+                          repeat: Infinity,
+                          delay: index * 0.3
+                        }}
+                      />
+                    </div>
+                  </motion.div>
+              </motion.div>
             ))}
           </div>
 
@@ -269,7 +268,6 @@ export function EnhancedHero() {
             </motion.button>
           </motion.div>
         </div>
-      </div>
-    </AnimatedBackground>
+    </div>
   );
 }

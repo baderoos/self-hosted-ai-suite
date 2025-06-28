@@ -40,11 +40,14 @@ export function WorkspaceSelector() {
     setError(null);
     
     try {
-      await createWorkspace(newWorkspaceName);
+      const workspace = await createWorkspace(newWorkspaceName);
+      console.log('Workspace created successfully:', workspace);
       setNewWorkspaceName('');
       setIsCreating(false);
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to create workspace');
+      const errorMessage = err instanceof Error ? err.message : 'Failed to create workspace';
+      console.error('Workspace creation error:', errorMessage);
+      setError(errorMessage);
     } finally {
       setIsSubmitting(false);
     }
