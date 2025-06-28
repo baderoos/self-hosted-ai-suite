@@ -1,5 +1,6 @@
 import React from "react";
 import { motion } from "framer-motion";
+import { colorClassMap } from "../../lib/colorClassMap";
 
 interface Metric {
   label: string;
@@ -13,18 +14,6 @@ interface SystemMetricsProps {
   echoMetrics: Metric[];
   systemMetrics: Metric[];
 }
-
-// Update colorMap to include both text and bg classes
-const colorMap: Record<string, { text: string; bg: string }> = {
-  blue: { text: "text-blue-500", bg: "bg-blue-500" },
-  green: { text: "text-green-500", bg: "bg-green-500" },
-  red: { text: "text-red-500", bg: "bg-red-500" },
-  yellow: { text: "text-yellow-500", bg: "bg-yellow-500" },
-  purple: { text: "text-purple-500", bg: "bg-purple-500" },
-  orange: { text: "text-orange-500", bg: "bg-orange-500" },
-  gray: { text: "text-gray-500", bg: "bg-gray-500" },
-  // Add more as needed
-};
 
 export function SystemMetrics({
   echoMetrics,
@@ -48,7 +37,12 @@ export function SystemMetrics({
             transition={{ delay: 1 + index * 0.1 }}
           >
             <div className="flex items-center space-x-3">
-              <metric.icon size={16} className={colorMap[metric.color]?.text || "text-gray-500"} />
+              <metric.icon
+                size={16}
+                className={`${
+                  colorClassMap[metric.color]?.text || "text-gray-500"
+                } ${colorClassMap[metric.color]?.darkText || ""}`}
+              />
               <span className="text-sm text-neutral-700 dark:text-neutral-300">
                 {metric.label}
               </span>
@@ -56,7 +50,9 @@ export function SystemMetrics({
             <div className="flex items-center space-x-2">
               <div className="w-16 bg-neutral-200 dark:bg-neutral-600 rounded-full h-2">
                 <motion.div
-                  className={`h-2 ${colorMap[metric.color]?.bg || "bg-gray-500"} rounded-full`}
+                  className={`h-2 ${
+                    colorClassMap[metric.color]?.bar || "bg-gray-500"
+                  } rounded-full`}
                   initial={{ width: 0 }}
                   animate={{ width: `${metric.value}%` }}
                   transition={{ duration: 1, delay: 1.2 + index * 0.1 }}

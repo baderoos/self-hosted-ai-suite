@@ -1,6 +1,7 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import { Activity } from 'lucide-react';
+import { colorClassMap } from '../../lib/colorClassMap';
 
 interface AIAgent {
   name: string;
@@ -15,36 +16,6 @@ interface AIAgentStatusProps {
   agents: AIAgent[];
   getAgentStatusColor: (status: string) => string;
 }
-
-// Map agent colors to static Tailwind classes
-const colorClassMap: Record<string, { bg: string; text: string; bar: string }> = {
-  blue: {
-    bg: "bg-blue-100 dark:bg-blue-900/30",
-    text: "text-blue-600 dark:text-blue-400",
-    bar: "bg-blue-500"
-  },
-  green: {
-    bg: "bg-green-100 dark:bg-green-900/30",
-    text: "text-green-600 dark:text-green-400",
-    bar: "bg-green-500"
-  },
-  red: {
-    bg: "bg-red-100 dark:bg-red-900/30",
-    text: "text-red-600 dark:text-red-400",
-    bar: "bg-red-500"
-  },
-  yellow: {
-    bg: "bg-yellow-100 dark:bg-yellow-900/30",
-    text: "text-yellow-600 dark:text-yellow-400",
-    bar: "bg-yellow-500"
-  },
-  purple: {
-    bg: "bg-purple-100 dark:bg-purple-900/30",
-    text: "text-purple-600 dark:text-purple-400",
-    bar: "bg-purple-500"
-  },
-  // Add more colors as needed
-};
 
 export function AIAgentStatus({ agents, getAgentStatusColor }: AIAgentStatusProps) {
   return (

@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '../lib/supabaseClient';
 
+// Define User interface
 export interface User {
   id: string;
   email: string;
@@ -8,6 +9,7 @@ export interface User {
   avatar_url: string | null;
 }
 
+// Define LoginCredentials interface
 export interface LoginCredentials {
   email: string;
   password: string;
@@ -17,7 +19,7 @@ export function useAuth() {
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [session, setSession] = useState(supabase.auth.getSession());
+  const [session, setSession] = useState<any>(null);
 
   const login = useCallback(async (credentials: LoginCredentials) => {
     setIsLoading(true);

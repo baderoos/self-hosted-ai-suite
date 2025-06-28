@@ -44,9 +44,7 @@ export function RecentJobs({ jobs }: RecentJobsProps) {
               transition={{ delay: 0.6 + index * 0.1 }}
               whileHover={{ x: 10 }}
             >
-              <div className="flex-shrink-0">
-              <div className="flex-shrink-0">
-                {job.status === 'completed' && (
+              <div className="flex-shrink-0">                {job.status === 'completed' && (
                   <CheckCircle size={24} className="text-emerald-500" />
                 )}
                 {job.status === 'processing' && (
