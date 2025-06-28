@@ -44,13 +44,10 @@ export function useAuth() {
         console.error('Error fetching profile:', profileError);
       }
       
-      // Check if name column exists in the profile
-      const profileName = profileData?.name !== undefined ? profileData?.name : null;
-      
       setUser({
         id: data.user.id,
         email: data.user.email!,
-        name: profileName,
+        name: profileData?.name || null,
         avatar_url: profileData?.avatar_url || null
       });
 
@@ -201,8 +198,7 @@ export function useAuth() {
             .insert([
               {
                 user_id: data.user.id,
-                name,
-              }
+                name
             ]);
             
           if (profileError) {

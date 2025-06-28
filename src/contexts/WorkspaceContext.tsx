@@ -127,31 +127,29 @@ export function WorkspaceProvider({ children }: WorkspaceProviderProps) {
   const loadWorkspaceMembers = async () => {
     try {
       const { data, error } = await supabase
-        .from('workspace_members')
+        .from('workspace_members as wm')
         .select(`
-          user_id,
-          role,
-          created_at,
-          profiles:user_id (
+          wm.user_id,
+          wm.role,
+          wm.created_at,
+          profiles:profiles!user_id (
             name,
             avatar_url
           ),
-          auth_users:user_id (
-            email,
-            name,
-            avatar_url
+          users:auth.users!user_id (
+            email
           )
         `)
-        .eq('workspace_id', activeWorkspace!.id);
+        .eq('wm.workspace_id', activeWorkspace!.id);
 
       if (error) throw error;
 
       const formattedMembers = data.map(item => ({
         id: item.user_id,
-        email: item.auth_users?.email || '',
-        name: item.profiles?.name || item.auth_users?.name || null,
+        email: item.users?.email || '',
+        name: item.profiles?.name || null,
         role: item.role,
-        avatar_url: item.profiles?.avatar_url || item.auth_users?.avatar_url || null,
+        avatar_url: item.profiles?.avatar_url || null,
         joined_at: item.created_at
       }));
 
@@ -160,34 +158,18 @@ export function WorkspaceProvider({ children }: WorkspaceProviderProps) {
       console.error('Error loading members:', err);
       // Fallback query without joins if the above fails
       try {
-        const { data: membersData, error: membersError } = await supabase
-          .from('workspace_members')
-          .select('user_id, role, created_at')
-          .eq('workspace_id', activeWorkspace!.id);
+        // Simpler query without complex joins
+        const { data: membersData, error: membersError } = await supabase.rpc(
+          'get_workspace_members',
+          { workspace_uuid: activeWorkspace!.id }
+        );
 
         if (membersError) throw membersError;
 
-        // Get user details separately
-        const memberPromises = membersData.map(async (member) => {
-          const { data: userData } = await supabase.auth.admin.getUserById(member.user_id);
-          const { data: profileData } = await supabase
-            .from('profiles')
-            .select('name, avatar_url')
-            .eq('user_id', member.user_id)
-            .single();
-
-          return {
-            id: member.user_id,
-            email: userData.user?.email || '',
-            name: profileData?.name || userData.user?.user_metadata?.name || null,
-            role: member.role,
-            avatar_url: profileData?.avatar_url || userData.user?.user_metadata?.avatar_url || null,
-            joined_at: member.created_at
-          };
-        });
-
-        const members = await Promise.all(memberPromises);
-        setMembers(members);
+        // Use the RPC result directly
+        if (membersData) {
+          setMembers(membersData);
+        }
       } catch (fallbackErr) {
         console.error('Fallback member loading also failed:', fallbackErr);
       }
