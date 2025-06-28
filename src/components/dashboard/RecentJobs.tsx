@@ -58,9 +58,9 @@ export function RecentJobs({ jobs }: RecentJobsProps) {
                 {job.status === 'scheduled' && (
                   <AlertCircle size={24} className="text-blue-500" />
                 )}
-+               {!['completed', 'processing', 'scheduled'].includes(job.status) && (
-+                 <AlertCircle size={24} className="text-gray-500" />
-+               )}
+                {!['completed', 'processing', 'scheduled'].includes(job.status) && (
+                  <AlertCircle size={24} className="text-gray-500" />
+                )}
               </div>              </div>
               <div className="flex-1 min-w-0">
                 <div className="flex items-center space-x-2 mb-1">
