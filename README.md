@@ -52,6 +52,32 @@ The schema implements comprehensive security using Supabase Row Level Security (
    - `add_social_media_schema.sql`
    - `add_support_schema.sql`
 
+## Local Development: Database Seeding
+
+After running `supabase db reset`, you can seed your local database with initial data:
+
+```
+npm run seed
+```
+
+This will execute `supabase/seed.sql` using the Supabase CLI. Edit `supabase/seed.sql` to add or update your seed data as needed.
+
+- The seed script is safe to run multiple times (uses `on conflict do nothing` for idempotency).
+- For creating test users, use the Supabase dashboard or authentication API, not direct SQL.
+
+## Automated User Creation
+
+To create test users in your local Supabase instance, run:
+
+```
+npm run seed:users
+```
+
+This uses the Supabase Admin API and requires `SUPABASE_SERVICE_ROLE_KEY` in your `.env` file. The script will create users and you can then link their UUIDs in `supabase/seed.sql` for workspace memberships.
+
+- After running `seed:users`, check the output for user UUIDs and update `workspace_memberships` in `seed.sql` if needed.
+- You can automate this further by extending the user seed script to insert memberships via the API.
+
 ## Entity Relationship Diagram
 
 [View the ERD diagram](https://dbdiagram.io/d/nexus-platform-schema)
