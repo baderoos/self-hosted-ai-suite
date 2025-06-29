@@ -27,6 +27,7 @@
   "dependencies": {
     "@devcycle/react-client-sdk": "^1.40.1",
     "@fingerprintjs/fingerprintjs": "^4.6.2",
+    "@sentry/react": "^9.33.0",
     "@supabase/supabase-js": "^2.39.7",
     "express": "^4.19.3",
     "framer-motion": "^10.16.16",
