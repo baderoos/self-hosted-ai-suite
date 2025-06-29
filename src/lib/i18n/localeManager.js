@@ -31,12 +31,14 @@ export async function getLocale(localeId) {
     : DEFAULT_LOCALE;
 
   if (loadedLocales[targetLocale]) {
+    loadedLocales[localeId] = loadedLocales[targetLocale]; // Cache with original key
     return loadedLocales[targetLocale];
   }
 
   try {
     const localeModule = await import(`date-fns/locale/${targetLocale}`);
     loadedLocales[targetLocale] = localeModule.default;
+    loadedLocales[localeId] = localeModule.default; // Cache with both keys
     return localeModule.default;
   } catch (error) {
     console.error(

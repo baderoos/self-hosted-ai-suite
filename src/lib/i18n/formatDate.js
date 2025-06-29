@@ -17,8 +17,13 @@ export async function formatDate(date, formatString, options = {}) {
   const localeId = getCurrentLocaleId();
   const locale = await getLocale(localeId);
 
-  return format(date, formatString, {
-    ...options,
-    locale,
-  });
+    return format(date, formatString, {
+      ...options,
+      locale,
+    });
+  } catch (error) {
+    console.error('formatDate: Error formatting date', error);
+    // Fallback to default formatting without locale
+    return format(date, formatString, options);
+  }
 }
