@@ -20,7 +20,15 @@ const DEFAULT_LOCALE = 'en-US';
 export async function getLocale(localeId) {
   // Use the primary language subtag (e.g., 'es' from 'es-ES')
   const baseLocale = (localeId || '').split('-')[0];
-  const targetLocale = SUPPORTED_LOCALES.includes(baseLocale) ? baseLocale : DEFAULT_LOCALE;
+
+  // If we got an empty string, fall back
+  if (!baseLocale) {
+    return loadedLocales[DEFAULT_LOCALE];
+  }
+
+  const targetLocale = SUPPORTED_LOCALES.includes(baseLocale)
+    ? baseLocale
+    : DEFAULT_LOCALE;
 
   if (loadedLocales[targetLocale]) {
     return loadedLocales[targetLocale];
