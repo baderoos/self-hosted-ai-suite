@@ -11,11 +11,18 @@
     "build": "vite build",
     "server": "node src/api/server.js",
     "dev:all": "concurrently \"npm run dev\" \"npm run server\"",
-    "lint": "eslint .",
+    "lint": "eslint . --ext .js,.jsx,.ts,.tsx",
+    "format": "prettier --write .",
+    "typecheck": "tsc --noEmit",
     "preview": "vite preview",
     "test": "vitest run --coverage",
     "seed": "node scripts/seed.js",
-    "seed:users": "node scripts/seedUsers.js"
+    "seed:users": "node scripts/seedUsers.js",
+    "dev:setup": "node scripts/devSetup.js",
+    "devsetup": "npm run dev:setup",
+    "audit": "npm audit --audit-level=moderate || true",
+    "lighthouse": "npx lighthouse http://localhost:5173 --quiet --chrome-flags='--headless' --output html --output-path ./lighthouse-report.html",
+    "analytics:posthog": "echo 'Integrate PostHog in your app for analytics'"
   },
   "dependencies": {
     "@devcycle/react-client-sdk": "^1.40.1",

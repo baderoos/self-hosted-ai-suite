@@ -18,8 +18,15 @@ interface RecentJobsProps {
 }
 
 export function RecentJobs({ jobs }: RecentJobsProps) {
+  // Status to className mapping
+  const statusStyles: Record<string, string> = {
+    completed: 'bg-emerald-100 text-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-400',
+    processing: 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400',
+    scheduled: 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400',
+    default: 'bg-gray-100 text-gray-800 dark:bg-gray-900/30 dark:text-gray-400',
+  };
   return (
-    <motion.div 
+    <motion.div
       className="lg:col-span-2"
       initial={{ opacity: 0, x: -50 }}
       animate={{ opacity: 1, x: 0 }}
@@ -51,14 +58,12 @@ export function RecentJobs({ jobs }: RecentJobsProps) {
                 {job.status === 'processing' && (
                   <motion.div
                     animate={{ rotate: 360 }}
-                    transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
+                    transition={{ duration: 2, repeat: Infinity, ease: 'linear' }}
                   >
                     <Clock size={24} className="text-yellow-500" />
                   </motion.div>
                 )}
-                {job.status === 'scheduled' && (
-                  <AlertCircle size={24} className="text-blue-500" />
-                )}
+                {job.status === 'scheduled' && <AlertCircle size={24} className="text-blue-500" />}
                 {!['completed', 'processing', 'scheduled'].includes(job.status) && (
                   <AlertCircle size={24} className="text-gray-500" />
                 )}
@@ -79,24 +84,25 @@ export function RecentJobs({ jobs }: RecentJobsProps) {
                   <span>•</span>
                   <span>{job.duration}</span>
                 </div>
-                {job.progress && (
-                  <div className="mt-2 w-full bg-neutral-200 dark:bg-neutral-600 rounded-full h-1">
-                    <motion.div 
-                      className="h-1 bg-gradient-to-r from-primary-500 to-secondary-500 rounded-full"
-                      initial={{ width: 0 }}
-                      animate={{ width: `${job.progress}%` }}
-                      transition={{ duration: 0.8 }}
-                    />
-                  </div>
-                )}
-                <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium
-                  ${job.status === 'completed' ? 'bg-emerald-100 text-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-400' : ''}
-                  ${job.status === 'processing' ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400' : ''}
-                  ${job.status === 'scheduled' ? 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400' : ''}
-                  ${!['completed', 'processing', 'scheduled'].includes(job.status) ? 'bg-gray-100 text-gray-800 dark:bg-gray-900/30 dark:text-gray-400' : ''}
-                `}>
-                  {job.status}
-                </span>
+                <div className="flex flex-col gap-2 w-full">
+                  {job.progress && (
+                    <div className="w-full bg-neutral-200 dark:bg-neutral-600 rounded-full h-1">
+                      <motion.div
+                        className="h-1 bg-gradient-to-r from-primary-500 to-secondary-500 rounded-full"
+                        initial={{ width: 0 }}
+                        animate={{ width: `${job.progress}%` }}
+                        transition={{ duration: 0.8 }}
+                      />
+                    </div>
+                  )}
+                  <span
+                    className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium
+                    ${statusStyles[job.status] || statusStyles.default}
+                  `}
+                  >
+                    {job.status}
+                  </span>
+                </div>
               </div>
             </motion.div>
           ))}

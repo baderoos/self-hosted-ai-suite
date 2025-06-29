@@ -1,14 +1,14 @@
-import React, { useState, useEffect } from "react";
-import { supabase } from "../lib/supabaseClient";
-import type { User } from "@supabase/auth-js";
-import { AuthForm } from "./auth/AuthForm";
-import { UserProfile } from "./auth/UserProfile";
+import React, { useState, useEffect } from 'react';
+import { supabase } from '../lib/supabaseClient';
+import type { User } from '@supabase/auth-js';
+import { AuthForm } from './auth/AuthForm';
+import { UserProfile } from './auth/UserProfile';
 
 export default function SupabaseAuth() {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
   const [user, setUser] = useState<User | null>(null);
-  const [error, setError] = useState("");
+  const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
@@ -39,18 +39,18 @@ export default function SupabaseAuth() {
           user={user}
           onSignOut={async () => {
             setLoading(true);
-            setError("");
+            setError('');
             try {
               const { error } = await supabase.auth.signOut();
               if (error) {
                 setError(error.message);
-                console.error("Sign out error:", error.message);
+                console.error('Sign out error:', error.message);
               } else {
                 setUser(null);
               }
             } catch (err) {
-              setError("Unexpected error during sign out.");
-              console.error("Unexpected sign out error:", err);
+              setError('Unexpected error during sign out.');
+              console.error('Unexpected sign out error:', err);
             } finally {
               setLoading(false);
             }
@@ -67,7 +67,7 @@ export default function SupabaseAuth() {
           onSignIn={async (e) => {
             e.preventDefault();
             setLoading(true);
-            setError("");
+            setError('');
             const { data, error } = await supabase.auth.signInWithPassword({
               email,
               password,
@@ -79,7 +79,7 @@ export default function SupabaseAuth() {
           onSignUp={async (e) => {
             e.preventDefault();
             setLoading(true);
-            setError("");
+            setError('');
             const { data, error } = await supabase.auth.signUp({
               email,
               password,
@@ -91,7 +91,7 @@ export default function SupabaseAuth() {
             } else {
               // If user is null, confirmation may be required
               setError(
-                "Sign-up successful! Please check your email to confirm your account before signing in."
+                'Sign-up successful! Please check your email to confirm your account before signing in.',
               );
             }
             setLoading(false);
