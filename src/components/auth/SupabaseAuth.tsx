@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { supabase } from '../lib/supabaseClient';
-import type { User } from '@supabase/auth-js';
+import type { User, Session } from '@supabase/auth-js';
 
 export default function SupabaseAuth() {
   const [email, setEmail] = useState('');
@@ -22,7 +22,7 @@ export default function SupabaseAuth() {
     // Listen for auth changes
     const {
       data: { subscription },
-    } = supabase.auth.onAuthStateChange((event, session) => {
+    } = supabase.auth.onAuthStateChange((_event: string, session: Session | null) => {
       setUser(session?.user ?? null);
     });
 
@@ -32,21 +32,18 @@ export default function SupabaseAuth() {
     };
   }, []);
 
-  const handleSignUp = async (e: React.FormEvent) => {
+  const handleSignUp = async (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
-
     // Basic email validation
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(email)) {
       setError('Please enter a valid email address');
       return;
     }
-
     if (password.length < 6) {
       setError('Password must be at least 6 characters long');
       return;
     }
-
     setLoading(true);
     setError('');
     try {
@@ -55,7 +52,6 @@ export default function SupabaseAuth() {
         setError(error.message);
       } else {
         setUser(data.user);
-        // Clear form on success
         setEmail('');
         setPassword('');
       }
@@ -66,11 +62,11 @@ export default function SupabaseAuth() {
       setLoading(false);
     }
   };
-  const handleSignIn = async (e: React.FormEvent) => {
+
+  const handleSignIn = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setLoading(true);
     setError('');
-
     try {
       const { data, error } = await supabase.auth.signInWithPassword({
         email,
@@ -80,10 +76,46 @@ export default function SupabaseAuth() {
         setError(error.message);
       } else {
         setUser(data.user);
-        // Clear form on success
         setEmail('');
         setPassword('');
       }
+    } catch (err) {
+      setError('Unexpected error during sign in');
+      console.error('Sign in error:', err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleSignOut = async () => {
+    setLoading(true);
+    setError('');
+    try {
+      const { error } = await supabase.auth.signOut();
+      if (error) {
+        setError(error.message);
+        console.error('Sign out error:', error.message);
+      } else {
+        setUser(null);
+      }
+    } catch (err) {
+      setError('Unexpected error during sign out.');
+      console.error('Unexpected sign out error:', err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <div className="max-w-sm mx-auto p-4 border rounded shadow">
+      {user ? (
+        <div>
+          <p>Welcome, {user.email}</p>
+          <button onClick={handleSignOut} disabled={loading}>
+            Sign Out
+          </button>
+        </div>
+      ) : (
         <form onSubmit={handleSignIn} noValidate>
           <input
             className="block w-full mb-2 p-2 border rounded"
@@ -130,40 +162,6 @@ export default function SupabaseAuth() {
               {error}
             </p>
           )}
-        </form>      ) : (
-        <form onSubmit={handleSignIn}>
-          <input
-            className="block w-full mb-2 p-2 border rounded"
-            type="email"
-            placeholder="Email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-          />
-          <input
-            className="block w-full mb-2 p-2 border rounded"
-            type="password"
-            placeholder="Password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-          />
-          <div className="flex gap-2">
-            <button
-              type="submit"
-              className="bg-blue-500 text-white px-4 py-2 rounded"
-              disabled={loading}
-            >
-              Sign In
-            </button>
-            <button
-              type="button"
-              onClick={handleSignUp}
-              className="bg-green-500 text-white px-4 py-2 rounded"
-              disabled={loading}
-            >
-              Sign Up
-            </button>
-          </div>
-          {error && <p className="text-red-500 mt-2">{error}</p>}
         </form>
       )}
     </div>
