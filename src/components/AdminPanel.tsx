@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 
 interface User {
   id: string;
@@ -447,7 +447,7 @@ export function AdminPanel() {
                 :{log.action}
               </div>
             ))
-          }
+          )}
         </div>
       </section>
     </div>
