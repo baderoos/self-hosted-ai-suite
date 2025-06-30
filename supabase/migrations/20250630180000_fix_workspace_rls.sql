@@ -65,14 +65,16 @@ ALTER TABLE workspace_members ENABLE ROW LEVEL SECURITY;
 CREATE POLICY "member_view_own"
   ON workspace_members
   FOR SELECT
-  TO public
+  TO authenticated
   USING (user_id = auth.uid());
 
 CREATE POLICY "member_insert_own"
   ON workspace_members
   FOR INSERT
-  TO public
-  WITH CHECK (user_id = auth.uid());CREATE POLICY "member_update_own"
+  TO authenticated
+  WITH CHECK (user_id = auth.uid());
+
+CREATE POLICY "member_update_own"
   ON workspace_members
   FOR UPDATE
   TO public
@@ -82,10 +84,8 @@ CREATE POLICY "member_insert_own"
 CREATE POLICY "member_delete_own"
   ON workspace_members
   FOR DELETE
-  TO public
-  USING (user_id = auth.uid());
-
-CREATE POLICY "workspace_owner_manage"
+  TO authenticated
+  USING (user_id = auth.uid());CREATE POLICY "workspace_owner_manage"
   ON workspace_members
   FOR ALL
   TO authenticated
@@ -108,8 +108,10 @@ CREATE POLICY "workspace_owner_manage"
 CREATE OR REPLACE FUNCTION is_workspace_admin(workspace_id uuid, user_id uuid)
 RETURNS boolean
 LANGUAGE plpgsql
+STABLE
 SECURITY DEFINER
-AS $$
+SET search_path = public, pg_temp
+AS $
 BEGIN
   RETURN EXISTS (
     SELECT 1 FROM workspace_members
@@ -118,8 +120,7 @@ BEGIN
       AND workspace_members.role = 'admin'
   );
 END;
-$$;
-
+$;
 -- Grant execute permission to authenticated users
 GRANT EXECUTE ON FUNCTION is_workspace_admin(uuid, uuid) TO authenticated;
 

@@ -22,7 +22,8 @@
     "devsetup": "npm run dev:setup",
     "audit": "npm audit --audit-level=moderate || true",
     "lighthouse": "npx lighthouse http://localhost:5173 --quiet --chrome-flags='--headless' --output html --output-path ./lighthouse-report.html",
-    "analytics:posthog": "echo 'Integrate PostHog in your app for analytics'"
+    "analytics:posthog": "echo 'Integrate PostHog in your app for analytics'",
+    "lint:sql": "npx @supabase/splinter lint supabase/migrations"
   },
   "dependencies": {
     "@devcycle/react-client-sdk": "^1.40.1",
@@ -36,7 +37,8 @@
     "posthog-js": "^1.157.2",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
-    "stripe": "^14.19.0"
+    "stripe": "^14.19.0",
+    "@supabase/splinter": "^0.1.7"
   },
   "devDependencies": {
     "@eslint/js": "^9.9.1",
