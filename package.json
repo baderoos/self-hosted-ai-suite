@@ -30,6 +30,7 @@
     "@fingerprintjs/fingerprintjs": "^4.6.2",
     "@sentry/react": "^9.33.0",
     "@supabase/supabase-js": "^2.39.7",
+    "@vercel/speed-insights": "^1.2.0",
     "express": "^4.19.3",
     "framer-motion": "^10.16.16",
     "install": "^0.13.0",
